@@ -1,0 +1,35 @@
+# ===== 交付产物：体积大且可重建，不入库 =====
+# Android 安装包（flutter build apk --release 重新生成）
+*.apk
+*.aab
+# Windows 程序包与安装包（后续按 README 的构建命令生成）
+*.exe
+*.msix
+*.msixbundle
+*.appx
+*.appxbundle
+
+# ===== 本机素材：不参与构建，保留在本机 =====
+# 录屏源视频与截帧（截帧可用 scripts/extract-frames.ps1 重新生成）
+video/*.mp4
+video/frames/
+# 未被任何文件引用的图片素材
+bird.jpg
+# 临时评审探针：自述非交付测试，会让 flutter test 超时（与冻结基线一致排除）
+app/test/zz_review_probe_test.dart
+
+# ===== 密钥与签名：严禁入库 =====
+*.jks
+*.keystore
+*.p12
+*.pem
+key.properties
+
+# ===== 编辑器与系统杂项 =====
+.idea/
+.vscode/
+*.iml
+*.swp
+.DS_Store
+Thumbs.db
+desktop.ini

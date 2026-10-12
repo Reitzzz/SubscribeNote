@@ -1,0 +1,1310 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>订小阅 · UI 录像还原</title>
+  <style>
+    :root {
+      --ink: #17172a;
+      --muted: #8b8997;
+      --faint: #b8b5c0;
+      --primary: #17162f;
+      --primary-2: #26375f;
+      --surface: rgba(255, 255, 255, .82);
+      --line: rgba(31, 30, 48, .075);
+      --danger: #f25247;
+      --orange: #d97757;
+      --radius: 14px;
+      --shadow: 0 10px 30px rgba(44, 38, 72, .07);
+      font-family: "PingFang SC", "Microsoft YaHei UI", "Microsoft YaHei", system-ui, sans-serif;
+      color: var(--ink);
+    }
+
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    button, input, select { font: inherit; }
+    button { color: inherit; }
+
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 15% 15%, #22304e 0, transparent 28%),
+        radial-gradient(circle at 85% 85%, #32233a 0, transparent 30%),
+        #090c13;
+    }
+
+    svg { display: block; }
+    .icon { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .icon-sm { width: 17px; height: 17px; }
+    .icon-lg { width: 26px; height: 26px; }
+
+    .phone {
+      position: relative;
+      width: min(390px, 100vw);
+      height: min(844px, 100dvh);
+      overflow: hidden;
+      background: linear-gradient(180deg, #edf4ff 0%, #f6f3fb 52%, #fff2f0 100%);
+      box-shadow: 0 32px 90px rgba(0, 0, 0, .42);
+      isolation: isolate;
+    }
+
+    .screen {
+      position: absolute;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      background: linear-gradient(180deg, #edf4ff 0%, #f7f4fb 54%, #fff3f1 100%);
+    }
+    .screen.active { display: flex; }
+
+    .statusbar {
+      height: 28px;
+      padding: 8px 14px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      font-size: 10px;
+      font-weight: 600;
+      color: #4f5260;
+      flex: 0 0 auto;
+    }
+    .status-icons { display: flex; align-items: center; gap: 4px; opacity: .78; }
+    .signal { display: flex; align-items: flex-end; gap: 1px; height: 10px; }
+    .signal i { display: block; width: 2px; background: currentColor; border-radius: 2px; }
+    .signal i:nth-child(1) { height: 3px; }
+    .signal i:nth-child(2) { height: 5px; }
+    .signal i:nth-child(3) { height: 7px; }
+    .signal i:nth-child(4) { height: 9px; }
+    .battery { width: 20px; height: 9px; border: 1px solid currentColor; border-radius: 3px; position: relative; padding: 1px; }
+    .battery::after { content: ""; position: absolute; right: -3px; top: 2px; width: 2px; height: 4px; border-radius: 0 1px 1px 0; background: currentColor; }
+    .battery b { display: block; width: 70%; height: 100%; border-radius: 1px; background: #49a56c; }
+
+    .appbar {
+      height: 52px;
+      padding: 0 12px;
+      display: grid;
+      grid-template-columns: 68px 1fr 68px;
+      align-items: center;
+      flex: 0 0 auto;
+    }
+    .app-title { text-align: center; font-weight: 650; font-size: 17px; letter-spacing: .02em; }
+    .bar-left { display: flex; align-items: center; }
+    .app-avatar, .icon-button, .back-button, .share-button {
+      border: 0;
+      background: transparent;
+      padding: 0;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      min-width: 44px;
+      min-height: 44px;
+      border-radius: 999px;
+      transition: background-color 140ms ease, opacity 140ms ease;
+    }
+    .app-avatar:hover, .icon-button:hover, .back-button:hover, .share-button:hover { background: rgba(24, 23, 47, .055); }
+    .app-avatar:active, .icon-button:active, .back-button:active, .share-button:active { background: rgba(24, 23, 47, .11); }
+    .app-avatar:focus-visible, .icon-button:focus-visible, .back-button:focus-visible, .share-button:focus-visible,
+    .nav-item:focus-visible, .primary:focus-visible, .secondary:focus-visible, .row-button:focus-visible,
+    .seg button:focus-visible, .review-controls button:focus-visible { outline: 3px solid rgba(65, 93, 169, .42); outline-offset: 2px; }
+    .app-avatar .mini-logo { width: 34px; height: 34px; }
+    .bar-spacer { width: 68px; }
+
+    .scroll {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow: auto;
+      padding: 4px 12px 100px;
+      scrollbar-width: none;
+      overscroll-behavior: contain;
+    }
+    .scroll::-webkit-scrollbar { display: none; }
+
+    .overview {
+      min-height: 120px;
+      padding: 16px 18px;
+      color: white;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #243858 0%, #12264a 72%, #18335d 100%);
+      box-shadow: 0 12px 26px rgba(23, 43, 78, .19);
+      position: relative;
+      overflow: hidden;
+    }
+    .overview::after { content: ""; position: absolute; width: 180px; height: 180px; border-radius: 50%; right: -90px; bottom: -110px; background: rgba(120,150,206,.12); }
+    .overview-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .overview-label { display: flex; align-items: center; gap: 6px; font-size: 13px; opacity: .92; }
+    .count-pill { padding: 4px 9px; border-radius: 999px; background: rgba(116, 207, 180, .18); border: 1px solid rgba(102, 222, 184, .22); font-size: 10px; color: #e8fff7; }
+    .overview-amount { margin-top: 18px; display: flex; align-items: baseline; gap: 7px; }
+    .overview-amount strong { font-size: 31px; line-height: 1; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+    .overview-amount span { font-size: 10px; color: rgba(255,255,255,.62); }
+    .share-button { position: absolute; right: 12px; bottom: 14px; min-width: 38px; min-height: 38px; color: rgba(255,255,255,.83); z-index: 1; }
+
+    .service-list { display: grid; gap: 10px; margin-top: 12px; }
+    .service-card {
+      width: 100%;
+      min-height: 72px;
+      padding: 12px 14px;
+      border: 0;
+      border-radius: 13px;
+      display: grid;
+      grid-template-columns: 44px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 10px;
+      text-align: left;
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgba(60, 42, 65, .035);
+      transition: filter 140ms ease, transform 140ms ease;
+    }
+    .service-card:hover { filter: brightness(.985); }
+    .service-card:active { transform: scale(.988); }
+    .service-card.claude { background: linear-gradient(110deg, #f7dddd, #f5e3e9); }
+    .service-card.wps { background: linear-gradient(110deg, #f8e3e4, #f8e5ea); }
+    .service-card.xsus { background: linear-gradient(110deg, #f7dfe1, #f5e2e8); }
+    .service-card.bilibili { background: linear-gradient(110deg, #f7e0e6, #f5e4e7); }
+    .service-card.apple { background: linear-gradient(110deg, #f8dfe1, #f7e6e8); }
+    .service-card.anti { background: linear-gradient(110deg, #f8e1e5, #f7e7e9); }
+    .service-logo { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 10px; font-weight: 850; font-size: 21px; background: rgba(255,255,255,.33); overflow: hidden; }
+    .service-logo.claude-logo { font-size: 29px; letter-spacing: -4px; color: #171717; background: transparent; }
+    .service-logo.wps-logo { color: #e64f20; font-weight: 900; font-style: italic; }
+    .service-logo.xsus-logo { color: #d64453; }
+    .service-logo.bili-logo { color: #19a9d2; }
+    .service-logo.apple-logo { color: white; background: #ef4055; border-radius: 9px; }
+    .service-logo.anti-logo { background: transparent; }
+    .anti-mark { width: 34px; height: 34px; border-radius: 50% 50% 43% 57%; background: conic-gradient(from 210deg, #2fb2be, #4f7ee9, #b35bb8, #f2a34a, #2fb2be); transform: rotate(-18deg) scale(.78); }
+    .service-main { min-width: 0; }
+    .service-name { display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 650; white-space: nowrap; }
+    .promo { padding: 2px 5px; border-radius: 5px; background: #f4a83e; color: white; font-size: 8px; font-weight: 600; }
+    .service-meta { margin-top: 6px; color: #91858c; font-size: 9px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .service-price { text-align: right; align-self: stretch; display: flex; flex-direction: column; justify-content: center; min-width: 88px; }
+    .service-price strong { font-size: 15px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .service-price strong small { margin-left: 2px; color: #8b858e; font-size: 8px; font-weight: 500; }
+    .service-price span { margin-top: 6px; color: #938b91; font-size: 9px; white-space: nowrap; }
+
+    .fab {
+      position: absolute;
+      right: 17px;
+      bottom: 73px;
+      width: 52px;
+      height: 52px;
+      border: 0;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 12px 25px rgba(24, 22, 48, .25);
+      cursor: pointer;
+      z-index: 5;
+      transition: transform 140ms ease, box-shadow 140ms ease;
+    }
+    .fab:hover { box-shadow: 0 15px 30px rgba(24, 22, 48, .31); }
+    .fab:active { transform: scale(.95); }
+
+    .bottom-nav {
+      position: absolute;
+      z-index: 4;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 64px;
+      padding: 4px 58px max(6px, env(safe-area-inset-bottom));
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255, 255, 255, .76);
+      border-top: 1px solid rgba(35, 33, 55, .05);
+      backdrop-filter: blur(18px);
+    }
+    .nav-item { min-width: 52px; min-height: 50px; border: 0; background: transparent; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: #a5a1ab; font-size: 9px; border-radius: 11px; }
+    .nav-item.active { color: var(--primary); }
+    .nav-item:hover { background: rgba(23,22,47,.045); }
+
+    .stats-scroll, .alternatives-scroll { padding-top: 0; }
+    .chip-row { display: flex; gap: 7px; overflow: auto; scrollbar-width: none; padding: 2px 0 9px; }
+    .chip-row::-webkit-scrollbar { display: none; }
+    .chip { flex: 0 0 auto; min-height: 29px; padding: 0 12px; border: 0; border-radius: 999px; background: rgba(255,255,255,.45); color: #777381; font-size: 10px; cursor: pointer; }
+    .chip.selected { color: white; background: var(--primary); }
+    .seg-wide { width: 100%; margin-bottom: 9px; display: grid; grid-template-columns: 1fr 1fr; padding: 2px; border-radius: 7px; background: rgba(35,33,52,.055); }
+    .seg-wide button { min-height: 27px; border: 0; border-radius: 6px; background: transparent; color: #aaa7b0; font-size: 10px; cursor: pointer; }
+    .seg-wide button.selected { background: var(--primary); color: white; }
+    .summary-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 7px; }
+    .summary-card { min-height: 58px; padding: 10px; border-radius: 9px; background: rgba(255,255,255,.72); border: 1px solid rgba(255,255,255,.52); }
+    .summary-card span { display: block; color: #a19da7; font-size: 8px; }
+    .summary-card strong { display: block; margin-top: 5px; font-size: 15px; }
+    .summary-card small { display: block; margin-top: 3px; color: #b7b3bc; font-size: 7px; }
+    .chart-card { margin-top: 9px; padding: 14px 13px; border-radius: 12px; background: rgba(255,255,255,.78); border: 1px solid rgba(255,255,255,.54); }
+    .chart-card.dark { color: white; background: linear-gradient(135deg,#283b62,#1c2d51); }
+    .chart-head { display: flex; justify-content: space-between; align-items: center; }
+    .chart-head strong { font-size: 12px; }
+    .chart-head span { color: #a9a6b0; font-size: 8px; }
+    .chart-card.dark .chart-head span { color: rgba(255,255,255,.65); }
+    .chart-help { margin: 8px 0 4px; color: #a9a5af; font-size: 8px; }
+    .chart-card.dark .chart-help { color: rgba(255,255,255,.55); }
+    .year-chart { height: 128px; padding: 16px 17px 2px 34px; position: relative; display: flex; justify-content: space-around; align-items: flex-end; border-bottom: 1px solid rgba(255,255,255,.2); background: repeating-linear-gradient(to bottom,transparent 0,transparent 26px,rgba(255,255,255,.08) 27px); }
+    .year-bar { width: 38px; height: 8%; border-radius: 2px 2px 0 0; background: linear-gradient(#7663ff,#5949cf); position: relative; }
+    .year-bar.current { height: 84%; }
+    .year-bar span { position: absolute; left: 50%; bottom: -17px; transform: translateX(-50%); color: rgba(255,255,255,.68); font-size: 8px; }
+    .year-bar b { position: absolute; left: 50%; top: -14px; transform: translateX(-50%); font-size: 7px; font-weight: 500; }
+    .month-chart { height: 110px; padding: 18px 8px 0; display: flex; align-items: flex-end; gap: 7px; background: repeating-linear-gradient(to bottom,transparent 0,transparent 25px,rgba(31,30,48,.055) 26px); }
+    .month-chart i { flex: 1; min-height: 4px; height: 14%; border-radius: 3px 3px 0 0; background: #d8d5df; }
+    .month-chart i:nth-child(3) { height: 88%; background: #5d51d5; }
+    .month-chart i:nth-child(n+4) { height: 30%; background: #7770b9; }
+    .ratio-card { margin-top: 9px; padding: 16px 16px 18px; border-radius: 12px; background: rgba(255,255,255,.78); border: 1px solid rgba(255,255,255,.54); }
+    .ratio-card.dark { color: white; background: linear-gradient(135deg,#2d3d65,#203252); }
+    .ratio-card h2 { margin: 0; font-size: 17px; }
+    .ratio-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+    .ratio-head span { color: #a8a6b0; font-size: 11px; }
+    .ratio-card.dark .ratio-head span { color: rgba(255,255,255,.55); }
+    .ratio-help { margin: 10px 0 0; color: #a8a5af; font-size: 10px; line-height: 1.5; }
+    .ratio-card.dark .ratio-help { color: rgba(255,255,255,.57); }
+    .donut { width: 140px; aspect-ratio: 1; margin: 28px auto 30px; border-radius: 50%; position: relative; background: conic-gradient(#695dff 0 42.5%, #ff696c 42.5% 68.8%, #48b4d0 68.8% 86%, #aaa 86%); }
+    .donut::after { content: ""; position: absolute; inset: 25%; border-radius: 50%; background: #2b3b60; }
+    .donut.monthly { background: conic-gradient(#695dff 0 76%, #aaa 76% 91.2%, #ff696c 91.2%); }
+    .donut.monthly::after { background: #fbf9fb; }
+    .ratio-legend { display: grid; gap: 10px; }
+    .legend-row { display: grid; grid-template-columns: 12px 1fr 28px 45px 70px; align-items: center; gap: 7px; font-size: 12px; }
+    .legend-row i { width: 8px; height: 8px; border-radius: 2px; background: var(--legend); }
+    .legend-row span:nth-child(3), .legend-row span:nth-child(4) { color: #a8a6b0; text-align: right; }
+    .legend-row strong { text-align: right; }
+    .month-tabs { margin: 14px -4px 20px; padding-bottom: 3px; display: flex; gap: 5px; overflow-x: auto; scrollbar-width: none; }
+    .month-tabs::-webkit-scrollbar { display: none; }
+    .month-tabs button { min-width: 42px; min-height: 38px; border: 0; border-radius: 8px; background: transparent; color: #8f8b94; cursor: pointer; }
+    .month-tabs button.selected { background: var(--primary); color: white; }
+    .month-summary { color: #66626c; font-size: 12px; }
+    .saving-card { padding: 12px; margin-bottom: 8px; border-radius: 10px; background: rgba(255,255,255,.7); position: relative; }
+    .saving-card button { position: absolute; right: 9px; top: 7px; border: 0; background: transparent; color: #b7b3bc; cursor: pointer; }
+    .saving-card strong { display: block; font-size: 11px; }
+    .saving-card p { margin: 6px 20px 0 0; color: #8f8a94; font-size: 8px; line-height: 1.5; }
+    .saving-card em { color: #34b977; font-style: normal; }
+    .alt-title { margin: 1px 0 8px; font-size: 13px; }
+    .alt-list { display: grid; gap: 8px; }
+    .alt-card { min-height: 86px; padding: 12px; border-radius: 11px; background: rgba(255,255,255,.72); display: grid; grid-template-columns: 39px 1fr auto; gap: 10px; align-items: start; }
+    .alt-logo { width: 36px; height: 36px; border-radius: 8px; display: grid; place-items: center; background: white; color: #2861bd; font-weight: 800; font-size: 17px; }
+    .alt-name { font-size: 12px; font-weight: 650; }
+    .alt-desc { margin-top: 5px; color: #77727c; font-size: 8px; line-height: 1.45; }
+    .alt-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+    .alt-tags span { padding: 2px 5px; border-radius: 3px; background: rgba(35,33,52,.035); color: #817c86; font-size: 7px; }
+    .alt-price { text-align: right; white-space: nowrap; font-size: 9px; }
+    .alt-price strong { font-size: 10px; }
+    .save-pill { display: block; margin-top: 4px; padding: 2px 5px; border-radius: 4px; background: #ddf7e8; color: #36b779; font-size: 7px; }
+    .add-scroll { padding-top: 0; padding-bottom: 22px; }
+    .search-box { height: 34px; padding: 0 11px; display: flex; align-items: center; gap: 7px; border-radius: 8px; background: rgba(255,255,255,.66); color: #aaa6af; }
+    .search-box input { width: 100%; border: 0; outline: 0; background: transparent; font-size: 10px; }
+    .manual-row { min-height: 55px; margin-top: 2px; display: flex; align-items: center; justify-content: space-between; font-size: 10px; }
+    .manual-actions { display: flex; gap: 7px; }
+    .manual-actions button { min-height: 28px; padding: 0 11px; border: 0; border-radius: 999px; background: var(--primary); color: white; font-size: 9px; cursor: pointer; }
+    .manual-actions .ai-button { background: linear-gradient(100deg,#423f8d,#7663d7); }
+    .library-title { margin: 4px 0 9px; font-size: 11px; }
+    .service-library { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .library-item { min-height: 46px; padding: 8px 10px; border: 0; border-radius: 8px; display: flex; align-items: center; gap: 8px; text-align: left; background: rgba(241,229,246,.76); cursor: pointer; font-size: 10px; }
+    .library-item:nth-child(3n+2) { background: rgba(231,238,249,.82); }
+    .library-item:nth-child(3n) { background: rgba(249,231,232,.8); }
+    .library-logo { width: 27px; height: 27px; flex: 0 0 auto; border-radius: 7px; display: grid; place-items: center; background: white; color: #4d55b7; font-weight: 800; }
+    .add-form-card { border-radius: 12px; overflow: hidden; background: rgba(255,255,255,.68); }
+    .service-editor { min-height: 74px; padding: 10px; display: grid; grid-template-columns: 48px 1fr auto; gap: 10px; align-items: center; background: rgba(222,237,252,.72); }
+    .service-editor .library-logo { width: 44px; height: 44px; border-radius: 50%; font-size: 21px; }
+    .service-editor input { width: 100%; height: 28px; border: 0; border-radius: 5px; padding: 0 7px; background: rgba(255,255,255,.45); font-weight: 600; font-size: 11px; outline: 0; }
+    .editor-price { display: flex; align-items: center; gap: 5px; margin-top: 4px; font-size: 10px; }
+    .editor-price input { width: 48px; font-size: 12px; text-align: right; }
+    .form-row { min-height: 52px; padding: 0 12px; display: flex; align-items: center; justify-content: space-between; gap: 10px; border-bottom: 1px solid var(--line); font-size: 11px; }
+    .form-row:last-child { border-bottom: 0; }
+    .form-row select, .form-row input { min-height: 30px; border: 0; border-radius: 6px; padding: 0 8px; background: rgba(35,33,52,.035); color: #6f6b75; font-size: 10px; outline: 0; }
+    .trial-fields { display: grid; grid-template-columns: 32px 39px 39px 56px; gap: 4px; }
+    .trial-fields input, .trial-fields select { width: 100%; padding: 0 3px; text-align: center; }
+    .note-area { width: 100%; min-height: 86px; padding: 10px 12px; border: 0; resize: none; background: transparent; outline: 0; font-size: 10px; }
+    .add-form-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 18px; }
+    .add-form-actions button { min-height: 43px; border-radius: 999px; }
+    .add-form-actions .secondary { border: 1px solid var(--primary); }
+
+    .detail-scroll { padding-top: 1px; padding-bottom: 116px; }
+    .detail-hero, .detail-row-card, .metric, .settings-card, .settings-group {
+      background: var(--surface);
+      border: 1px solid rgba(255,255,255,.54);
+      box-shadow: 0 8px 22px rgba(59, 52, 83, .035);
+    }
+    .detail-hero { min-height: 94px; border-radius: 13px; padding: 14px; display: grid; grid-template-columns: 54px 1fr auto; gap: 9px; background: linear-gradient(120deg, rgba(244,224,231,.9), rgba(239,230,241,.88)); }
+    .detail-hero .service-logo { width: 51px; height: 51px; }
+    .detail-name { font-weight: 650; font-size: 16px; margin-top: 3px; }
+    .detail-sub { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 12px; color: #8d8991; font-size: 10px; white-space: nowrap; }
+    .category-pill { align-self: start; padding: 7px 10px; border: 0; border-radius: 8px; background: rgba(255,255,255,.42); color: #66636c; font-size: 10px; cursor: pointer; }
+    .detail-row-card { margin-top: 10px; border-radius: 13px; overflow: hidden; }
+    .detail-row { min-height: 56px; padding: 0 14px; display: flex; align-items: center; justify-content: space-between; font-size: 13px; border-bottom: 1px solid var(--line); }
+    .detail-row:last-child { border-bottom: 0; }
+    .color-value { display: flex; align-items: center; gap: 5px; color: #74717c; font-size: 11px; }
+    .color-dot { width: 12px; height: 12px; border-radius: 50%; background: #d97757; }
+    .switch { width: 42px; height: 24px; border: 0; border-radius: 999px; padding: 2px; background: #dddde2; cursor: pointer; position: relative; transition: background 140ms ease; }
+    .switch::after { content: ""; position: absolute; width: 20px; height: 20px; top: 2px; left: 2px; border-radius: 50%; background: white; box-shadow: 0 1px 4px rgba(0,0,0,.14); transition: transform 140ms ease; }
+    .switch.on { background: var(--primary); }
+    .switch.on::after { transform: translateX(18px); }
+    .metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+    .metric { min-height: 67px; border-radius: 12px; padding: 12px 13px; }
+    .metric-label { color: #9b98a3; font-size: 9px; }
+    .metric strong { display: block; margin-top: 6px; font-size: 17px; font-weight: 650; font-variant-numeric: tabular-nums; }
+    .timeline { margin: 16px 2px 0; }
+    .timeline-item { min-height: 62px; padding: 0 0 14px 25px; position: relative; display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+    .timeline-item::before { content: ""; position: absolute; left: 7px; top: 9px; bottom: -8px; width: 1px; background: rgba(34,32,51,.14); }
+    .timeline-item:last-child::before { display: none; }
+    .timeline-dot { position: absolute; left: 3px; top: 7px; width: 9px; height: 9px; border-radius: 50%; background: var(--primary); border: 2px solid #f8f4fa; }
+    .timeline-dot.future { background: #c8e0f4; }
+    .timeline-dot.hollow { background: transparent; border: 1px solid #adaab4; }
+    .timeline-dot.danger { background: #ed9b9b; }
+    .timeline-date { color: #b2aeb8; font-size: 9px; }
+    .timeline-title { margin-top: 3px; font-size: 13px; font-weight: 620; }
+    .timeline-note { color: #aaa5ae; font-size: 9px; text-align: right; padding-top: 17px; white-space: nowrap; }
+    .promo-tag { margin-left: 4px; color: #cb8f2d; background: #fff1d4; padding: 2px 5px; border-radius: 5px; font-size: 8px; font-weight: 600; }
+    .cycle-divider { margin: -3px 0 12px 24px; display: flex; align-items: center; gap: 8px; color: #b0acb6; font-size: 9px; }
+    .cycle-divider::before, .cycle-divider::after { content: ""; height: 1px; flex: 1; background: rgba(35,33,53,.09); }
+    .delete-link { width: 100%; min-height: 44px; margin-top: 4px; border: 0; background: transparent; color: #e5665d; cursor: pointer; font-size: 12px; }
+    .sticky-actions { position: absolute; z-index: 6; left: 0; right: 0; bottom: 0; padding: 10px 12px max(13px, env(safe-area-inset-bottom)); display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: linear-gradient(180deg, rgba(255,244,242,0), rgba(255,244,242,.92) 23%, #fff3f1 55%); }
+    .primary, .secondary { min-height: 48px; border: 0; border-radius: 13px; cursor: pointer; font-weight: 620; font-size: 14px; transition: filter 140ms ease, transform 140ms ease; }
+    .primary { background: var(--primary); color: white; }
+    .secondary { background: rgba(255,255,255,.68); color: #3b3945; }
+    .danger-button { background: var(--danger); color: white; }
+    .primary:hover, .secondary:hover { filter: brightness(.96); }
+    .primary:active, .secondary:active { transform: scale(.985); }
+
+    .settings-scroll { padding-bottom: 30px; }
+    .settings-card { border-radius: 14px; min-height: 96px; padding: 14px; display: grid; grid-template-columns: 52px 1fr auto; align-items: center; gap: 12px; }
+    .profile-avatar { width: 51px; height: 51px; border-radius: 50%; background: linear-gradient(145deg, #f2b16f, #a94543); position: relative; overflow: hidden; }
+    .profile-avatar::before { content: ""; position: absolute; width: 22px; height: 30px; border-radius: 50% 50% 35% 35%; background: #b9473f; left: 14px; top: 19px; transform: rotate(-8deg); }
+    .profile-avatar::after { content: ""; position: absolute; width: 16px; height: 16px; border-radius: 50%; background: #f4c192; left: 19px; top: 8px; }
+    .profile-name { font-size: 16px; font-weight: 650; }
+    .profile-level { margin-top: 7px; color: #aaa7b0; font-size: 10px; }
+    .pro-pill { align-self: start; border: 0; padding: 7px 10px; border-radius: 999px; background: #fff1cf; color: #c57d24; font-size: 10px; cursor: pointer; }
+    .settings-group { margin-top: 10px; border-radius: 14px; overflow: hidden; }
+    .settings-row { min-height: 55px; padding: 0 13px; display: flex; align-items: center; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--line); font-size: 13px; }
+    .settings-row:last-child { border-bottom: 0; }
+    .settings-value { display: flex; align-items: center; gap: 4px; color: #aaa7b0; font-size: 10px; text-align: right; }
+    .row-button { width: 100%; min-height: 55px; border: 0; padding: 0 13px; background: transparent; display: flex; align-items: center; justify-content: space-between; gap: 12px; cursor: pointer; text-align: left; }
+    .row-button:hover { background: rgba(24,22,47,.025); }
+    .chevron { color: #c2bec7; font-size: 17px; }
+    .seg { display: grid; grid-auto-flow: column; padding: 2px; background: rgba(35,33,52,.055); border-radius: 8px; }
+    .seg button { min-height: 28px; padding: 0 11px; border: 0; border-radius: 6px; color: #aaa7b0; background: transparent; cursor: pointer; font-size: 10px; }
+    .seg button.selected { background: var(--primary); color: white; box-shadow: 0 2px 4px rgba(23,22,47,.15); }
+    .pro-label { margin-left: auto; margin-right: 8px; padding: 2px 6px; border-radius: 5px; background: #fff1c7; color: #d29638; font-size: 8px; }
+
+    .overlay {
+      position: absolute;
+      z-index: 20;
+      inset: 0;
+      display: none;
+      background: rgba(14, 14, 22, .42);
+      align-items: flex-end;
+    }
+    .overlay.open { display: flex; }
+    .sheet {
+      width: 100%;
+      max-height: 82%;
+      overflow: auto;
+      padding: 16px 14px calc(16px + env(safe-area-inset-bottom));
+      border-radius: 17px 17px 0 0;
+      background: rgba(255,255,255,.98);
+      box-shadow: 0 -18px 38px rgba(33,27,43,.13);
+      animation: sheet-in 210ms cubic-bezier(.2,.75,.2,1);
+    }
+    .sheet.medium { min-height: 510px; }
+    .sheet.small { min-height: 245px; }
+    .sheet-title { margin: 1px 0 13px; text-align: center; font-size: 17px; font-weight: 650; }
+    .sheet-row { min-height: 50px; display: flex; align-items: center; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--line); font-size: 13px; }
+    .sheet-row:last-of-type { border-bottom: 0; }
+    .sheet-value { color: #86818b; font-size: 12px; text-align: right; }
+    .price-input { width: 95px; border: 0; text-align: right; font-size: 17px; font-weight: 650; outline: none; background: transparent; }
+    .sheet-help { margin: 5px 0 4px; color: #aaa6af; font-size: 9px; line-height: 1.55; }
+    .sheet-actions { display: grid; grid-template-columns: .75fr 1.5fr; gap: 10px; margin-top: 14px; }
+    .sheet-actions .secondary { background: #f5f4f6; }
+    .picker-list { margin: 2px -14px -16px; padding: 10px 18px 18px; max-height: 310px; overflow: auto; text-align: center; mask-image: linear-gradient(transparent, black 18%, black 82%, transparent); }
+    .picker-item { width: 100%; min-height: 46px; border: 0; background: transparent; color: #b5b1b8; cursor: pointer; }
+    .picker-item.selected { color: #25222d; font-size: 16px; font-weight: 550; }
+    .picker-footer { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+
+    .dialog-wrap { align-items: center; justify-content: center; padding: 20px; }
+    .dialog {
+      width: 100%;
+      border-radius: 14px;
+      background: rgba(255,255,255,.98);
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0,0,0,.22);
+      animation: dialog-in 170ms ease-out;
+    }
+    .dialog-content { padding: 22px 20px 17px; }
+    .dialog-title { text-align: center; font-size: 16px; font-weight: 650; }
+    .dialog-text { margin-top: 12px; color: #85818b; font-size: 12px; line-height: 1.7; }
+    .dialog-actions { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--line); }
+    .dialog-actions button { min-height: 51px; border: 0; background: transparent; cursor: pointer; border-right: 1px solid var(--line); }
+    .dialog-actions button:last-child { border-right: 0; color: var(--danger); }
+    .export-dialog .dialog-title { text-align: left; }
+    .field-label { display: block; margin: 13px 0 7px; color: #8d8992; font-size: 10px; }
+    .email-input { width: 100%; height: 44px; padding: 0 11px; border: 1px solid rgba(34,32,51,.07); border-radius: 7px; background: #f8f7f8; outline: none; }
+    .email-input:focus { border-color: #68628a; box-shadow: 0 0 0 3px rgba(104,98,138,.12); }
+    .export-submit { width: 100%; margin-top: 15px; }
+    .close-x { position: absolute; right: 17px; top: 14px; width: 36px; height: 36px; border: 0; border-radius: 50%; background: transparent; cursor: pointer; color: #8d8993; }
+
+    .toast {
+      position: absolute;
+      z-index: 50;
+      left: 50%;
+      top: 42%;
+      width: max-content;
+      max-width: 240px;
+      transform: translate(-50%, -50%) scale(.95);
+      padding: 18px 17px;
+      border-radius: 12px;
+      background: rgba(44,43,47,.88);
+      color: white;
+      text-align: center;
+      line-height: 1.55;
+      font-size: 12px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 150ms ease, transform 150ms ease;
+    }
+    .toast.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    .toast-check { width: 28px; height: 15px; border-left: 2px solid white; border-bottom: 2px solid white; transform: rotate(-45deg); margin: 0 auto 14px; }
+
+    .review-controls {
+      position: fixed;
+      left: max(18px, calc(50vw - 430px));
+      top: 50%;
+      transform: translateY(-50%);
+      width: 185px;
+      padding: 14px;
+      border: 1px solid rgba(255,255,255,.09);
+      border-radius: 15px;
+      background: rgba(14,17,25,.86);
+      color: #e8ebf3;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 18px 45px rgba(0,0,0,.24);
+    }
+    .review-controls strong { display: block; margin-bottom: 3px; font-size: 13px; }
+    .review-controls p { margin: 0 0 10px; color: #858c9b; font-size: 10px; line-height: 1.5; }
+    .review-controls button { width: 100%; min-height: 36px; margin-top: 6px; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; background: rgba(255,255,255,.055); color: #d8dce5; cursor: pointer; text-align: left; padding: 0 10px; font-size: 11px; }
+    .review-controls button:hover { background: rgba(255,255,255,.1); }
+
+    @keyframes sheet-in { from { transform: translateY(32px); opacity: .7; } }
+    @keyframes dialog-in { from { transform: scale(.96); opacity: .4; } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation: none !important; transition-duration: .01ms !important; } }
+    @media (max-width: 820px) {
+      body { background: #edf4ff; }
+      .phone { width: 100vw; height: 100dvh; box-shadow: none; }
+      .review-controls { display: none; }
+    }
+    @media (max-height: 700px) and (orientation: landscape) {
+      .phone { width: min(390px, 46vw); height: 100dvh; }
+      .review-controls { left: 18px; }
+    }
+
+    /* Recording fidelity: keep the existing phone shell, reuse one set of sheets. */
+    button, select { touch-action: manipulation; }
+    button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid #7362df; outline-offset: 3px; }
+    button:active { filter: brightness(.95); }
+    .profile-avatar { background: url('assets/recording/avatar.png') center/cover; }
+    .profile-avatar::before, .profile-avatar::after { display: none; }
+    .service-logo img, .library-logo img, .alt-logo img { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: multiply; }
+    .service-logo { flex-shrink: 0; border: 0; padding: 0; }
+    .overview-label { border: 0; padding: 0; background: none; color: inherit; cursor: pointer; min-height: 30px; }
+    .overview-label span { padding: 3px 6px; border-radius: 12px; background: #ffffff12; font-size: 10px; }
+    .service-card.tencent { background: #fae8dc; }
+    .service-card.chatgpt { background: #e6eee7; }
+    .service-card.anti { background: #e9e8f1; }
+    .service-card.compact { min-height: 54px; padding-block: 6px; }
+    .service-card.compact .service-meta { display: none; }
+    .detail-hero { grid-template-columns: 51px minmax(0,1fr) auto; }
+    .detail-sub { flex-wrap: wrap; white-space: normal; }
+    .detail-actions { display: flex; flex-direction: column; gap: 0; padding-bottom: 4px; }
+    #detail-action-buttons { display: flex; justify-content: center; gap: 12px; }
+    #detail-action-buttons button { flex: 1; min-height: 42px; border-radius: 999px; }
+    #detail-action-buttons button:only-child { flex: 0 1 65%; }
+    .detail-actions .delete-link { margin: 0; min-height: 38px; }
+    .color-value, .profile-name { border: 0; background: transparent; cursor: pointer; padding: 0; }
+    .color-value { min-height: 44px; }
+    .timeline-note { white-space: normal; max-width: 170px; }
+    .sheet.medium { min-height: 0; }
+    .sheet-row button.sheet-value, .sheet-row input[type=date], .sheet-row select, .form-row > button, .editor-options button, .editor-price button { border: 0; padding: 5px 7px; border-radius: 5px; background: #f4f6f4; font-size: 11px; color: #777; cursor: pointer; }
+    .sheet-row .seg button { padding-inline: 8px; font-size: 10px; }
+    .sheet-actions .primary, .sheet-actions .secondary { border-radius: 999px; min-height: 42px; }
+    .form-error { color: #c94438; font-size: 11px; line-height: 1.5; margin: 8px 0 0; }
+    .form-error:empty { display: none; }
+    .picker-sheet { min-height: 280px; }
+    .picker-sheet .picker-list { height: 210px; margin: 0; padding: 0; scroll-padding: 70px; }
+    .picker-item { min-height: 44px; }
+    .picker-footer .primary { background: #00bd65; }
+    .picker-footer button { min-height: 40px; border-radius: 5px; }
+    .empty-state { margin: 110px auto; color: #aaa5af; font-size: 13px; }
+    .settings-footer { color: #b1adb5; font-size: 9px; text-align: center; line-height: 2; margin: 20px 0; }
+    .dialog-content h3 { font-size: 13px; margin: 15px 0 0; }
+    #logic-overlay .dialog-title, #redeem-overlay .dialog-title { text-align: left; }
+    #logic-overlay .dialog-text { margin-top: 4px; }
+    .service-editor { grid-template-columns: 44px minmax(0,1fr) auto; }
+    .editor-options { display: grid; gap: 12px; }
+    .editor-options button { font-size: 9px; padding: 4px; background: #ffffff40; }
+    #add-color { display: flex; align-items: center; gap: 3px; }
+    #add-color .color-dot { width: 7px; height: 7px; }
+    .editor-price input { width: 64px; }
+    .form-row input[type=number] { max-width: 60px; }
+    .trial-fields { grid-template-columns: 18px 35px 42px 58px; align-items: center; }
+    .library-item { overflow: hidden; }
+    .library-item > span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .library-empty { text-align: center; grid-column: 1/-1; color: #999; font-size: 12px; padding: 30px 5px; }
+    .icon-grid { display: grid; grid-template-columns: repeat(6,1fr); gap: 8px; padding-top: 15px; max-height: 240px; overflow: auto; }
+    .icon-grid button { min-height: 44px; border: 0; background: transparent; border-radius: 6px; display: grid; place-items: center; cursor: pointer; }
+    .icon-grid img { width: 30px; height: 30px; mix-blend-mode: multiply; }
+    .color-grid { display: grid; grid-template-columns: repeat(6,1fr); gap: 9px; }
+    .color-grid button { min-height: 40px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 0 1px #ddd; cursor: pointer; }
+    .color-grid button.selected { box-shadow: 0 0 0 2px #17162f; }
+    .alt-filters .chip.selected { color: var(--ink); background: #dfe2ef; box-shadow: inset 0 0 0 1px #464653; }
+    .saving-card strong { font-size: 12px; }
+    .saving-card p, .alt-desc { font-size: 10px; line-height: 1.6; }
+    .saving-card button { width: 32px; height: 32px; }
+    .alt-card { grid-template-columns: 34px minmax(0,1fr); min-height: 96px; padding: 13px 12px; cursor: pointer; border: 0; width: 100%; text-align: left; color: inherit; }
+    .alt-card-head { display: flex; align-items: baseline; justify-content: space-between; gap: 5px; }
+    .alt-name { font-size: 13px; }
+    .alt-desc { margin: 5px 0; }
+    .alt-tags span { font-size: 8px; }
+    .alt-price { font-weight: 500; font-size: 10px; }
+    .save-pill.costlier { color: #dd726c; background: #fff0ec; }
+    .chart-card { padding: 16px 14px; }
+    .chart-head strong { font-size: 14px; }
+    .chart-head span, .chart-help { font-size: 10px; }
+    .chart-help { line-height: 1.5; }
+    .plot { width: 100%; height: auto; margin: 12px 0 4px; overflow: visible; }
+    .plot text { font-family: inherit; font-size: 10px; fill: #9995a2; }
+    .chart-card.dark .plot text { fill: #bfc5d5; }
+    .plot .grid-line { stroke: #9e9cab; stroke-opacity: .18; }
+    .plot [role=button] { cursor: pointer; }
+    .summary-card { min-width: 0; }
+    .summary-card strong { font-size: 16px; }
+    .summary-card span, .summary-card small { font-size: 9px; }
+    .stat-categories .chip, .stat-years .chip { font-size: 11px; }
+    .stat-years .chip { min-height: 34px; min-width: 60px; }
+    .seg-wide button { min-height: 33px; font-size: 12px; }
+    .donut { width: 140px; margin: 34px auto 43px; }
+    .donut::after { inset: 18%; }
+    .donut.empty { background: #e0e2df !important; }
+    .donut.empty::after { content: "暂无消费"; display: grid; place-items: center; color: #aaa; font-size: 11px; }
+    .ratio-card { padding: 18px 16px 22px; }
+    .ratio-help { font-size: 11px; }
+    .ratio-legend { gap: 13px; }
+    .legend-row { grid-template-columns: 8px minmax(0,1fr) 27px 43px 74px; gap: 7px; font-size: 13px; }
+    .top-row { margin-top: 14px; display: grid; grid-template-columns: 1fr auto; gap: 7px; font-size: 12px; }
+    .top-track { grid-column: 1/-1; height: 5px; background: #eeecf2; border-radius: 6px; overflow: hidden; }
+    .top-track i { display: block; height: 100%; border-radius: 6px; }
+    .plot-summary { color: #999; font-size: 10px; }
+    @media (max-width: 400px) { .detail-hero { padding: 12px; gap: 7px; } .category-pill { padding: 6px; } .service-name { font-size: 13px; } }
+  </style>
+</head>
+<body>
+  <svg width="0" height="0" aria-hidden="true" style="position:absolute">
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5v8a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20V10m6 10V4m6 16v-7m4 7H2"/></symbol>
+    <symbol id="i-bulb" viewBox="0 0 24 24"><path d="M9 18h6m-5 3h4m4-10a6 6 0 1 0-9.8 4.6c.6.5.8 1 .8 1.4h6c0-.5.2-1 .8-1.4A6 6 0 0 0 18 11Z"/></symbol>
+    <symbol id="i-share" viewBox="0 0 24 24"><circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="m8.2 10.8 7.6-4.5M8.2 13.2l7.6 4.5"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-swap" viewBox="0 0 24 24"><path d="M7 7h11l-3-3m2 13H6l3 3"/></symbol>
+  </svg>
+
+  <aside class="review-controls" aria-label="录像状态快速切换">
+    <strong>录像 UI 状态</strong>
+    <p>手机宽度隐藏。录屏演示数据；编辑仅本次预览有效，刷新还原。统计保留原录屏快照。</p>
+    <button data-jump="home">首页</button>
+    <button data-subscription="claude">扣费详情</button>
+    <button data-jump="statistics">统计</button>
+    <button data-jump="alternatives">平替</button>
+    <button data-jump="add-library">添加订阅</button>
+    <button data-sheet="update">订阅更新 Sheet</button>
+    <button data-sheet="stop">停止订阅 Sheet</button>
+    <button data-jump="settings">设置</button>
+    <button data-sheet="export">导出弹窗</button>
+    <button data-sheet="delete">删除确认</button>
+  </aside>
+
+  <main class="phone" id="phone">
+    <section class="screen active" id="home" aria-label="订小阅首页">
+      <div class="statusbar"><span>23:14</span><span class="status-icons"><small>5G</small><span class="signal"><i></i><i></i><i></i><i></i></span><small>18%</small><span class="battery"><b></b></span></span></div>
+      <header class="appbar">
+        <div class="bar-left"><button class="app-avatar" data-jump="settings" aria-label="打开设置"><span class="mini-logo profile-avatar"></span></button></div>
+        <div class="app-title">订小阅</div>
+        <div class="bar-spacer"></div>
+      </header>
+      <div class="scroll">
+        <section class="overview" aria-label="订阅概览">
+          <div class="overview-head"><button class="overview-label" id="overview-toggle" aria-label="切换概览金额">概览 <span>⇆ 点击切换</span></button><span class="count-pill">当前共 8 项</span></div>
+          <div class="overview-amount"><strong>¥236.98</strong><span>月均成本</span></div>
+          <button class="share-button" aria-label="分享概览" data-sheet="share"><svg class="icon icon-sm"><use href="#i-share"/></svg></button>
+        </section>
+
+        <div class="service-list" aria-label="订阅列表">
+          <button class="service-card claude" data-subscription="claude">
+            <span class="service-logo claude-logo" aria-label="Claude">A⌁</span>
+            <span class="service-main"><span class="service-name">Claude <span class="promo">优惠中</span></span><span class="service-meta">AI · 2026.09.01 起</span></span>
+            <span class="service-price"><strong>$20<small>美元 月付</small></strong><span>30天后扣费</span></span>
+          </button>
+          <button class="service-card wps" data-subscription="wps"><span class="service-logo wps-logo">W</span><span class="service-main"><span class="service-name">WPS 会员</span><span class="service-meta">云服务 · 2026.07.26 起</span></span><span class="service-price"><strong>¥177<small>人民币</small></strong><span>2029.07.25 到期</span></span></button>
+          <button class="service-card xsus" data-subscription="xsus"><span class="service-logo xsus-logo">▰</span><span class="service-main"><span class="service-name">XSUS</span><span class="service-meta">其他 · 2026.01.18 起</span></span><span class="service-price"><strong>¥12<small>人民币 月付</small></strong><span>17天后扣费</span></span></button>
+          <button class="service-card bilibili" data-subscription="bilibili"><span class="service-logo bili-logo">▣</span><span class="service-main"><span class="service-name">Bilibili 大会员</span><span class="service-meta">影音 · 2026.08.02 起</span></span><span class="service-price"><strong>¥0<small>人民币</small></strong><span>30天后到期</span></span></button>
+          <button class="service-card apple" data-subscription="apple"><span class="service-logo apple-logo">♪</span><span class="service-main"><span class="service-name">Apple Music</span><span class="service-meta">影音 · 2026.03.29 起</span></span><span class="service-price"><strong>¥7<small>人民币 月付</small></strong><span>28天后扣费</span></span></button>
+          <button class="service-card anti" data-subscription="anti"><span class="service-logo anti-logo"><i class="anti-mark"></i></span><span class="service-main"><span class="service-name">Antigravity</span><span class="service-meta">AI · 2026.06.30 起</span></span><span class="service-price"><strong>¥16<small>人民币 年付</small></strong><span>302天后扣费</span></span></button>
+        </div>
+      </div>
+      <button class="fab" aria-label="添加订阅" data-jump="add-library"><svg class="icon icon-lg"><use href="#i-plus"/></svg></button>
+      <nav class="bottom-nav" aria-label="主导航">
+        <button class="nav-item active"><svg class="icon"><use href="#i-home"/></svg><span>首页</span></button>
+        <button class="nav-item" data-jump="statistics"><svg class="icon"><use href="#i-chart"/></svg><span>统计</span></button>
+        <button class="nav-item" data-jump="alternatives"><svg class="icon"><use href="#i-bulb"/></svg><span>平替</span></button>
+      </nav>
+    </section>
+
+    <section class="screen" id="detail" aria-label="扣费详情">
+      <div class="statusbar"><span>23:15</span><span class="status-icons"><small>5G</small><span class="signal"><i></i><i></i><i></i><i></i></span><small>19%</small><span class="battery"><b></b></span></span></div>
+      <header class="appbar">
+        <div class="bar-left"><button class="back-button" data-jump="home" aria-label="返回首页"><svg class="icon"><use href="#i-arrow"/></svg></button></div>
+        <div class="app-title">扣费详情</div>
+        <div class="bar-spacer"></div>
+      </header>
+      <div class="scroll detail-scroll">
+        <section class="detail-hero" id="detail-hero">
+          <button class="service-logo claude-logo" id="detail-logo" data-icon-target="detail" aria-label="选择订阅图标">A⌁</button>
+          <div><div class="detail-name" id="detail-name">Claude</div><div class="detail-sub"><span>价格：<b id="detail-price">$20 USD</b></span><span>周期：<b id="detail-cycle">每月 · 自动扣费</b></span></div></div>
+          <button class="category-pill" id="detail-category" data-picker="detail-category">AI 分类⌄</button>
+        </section>
+        <section class="detail-row-card">
+          <div class="detail-row"><span>卡片颜色</span><button class="color-value" data-color-target="detail"><i class="color-dot" id="detail-color-dot"></i><span id="detail-color">#D97757</span>⌄</button></div>
+          <div class="detail-row"><span>到期通知</span><button class="switch" aria-label="切换到期通知" aria-pressed="false"></button></div>
+        </section>
+        <section class="metrics">
+          <div class="metric"><span class="metric-label" id="detail-next-label">下次扣费日 · 30天后</span><strong id="detail-next">2026.10.01</strong></div>
+          <div class="metric"><span class="metric-label">月均费</span><strong id="detail-monthly">¥134.71</strong></div>
+          <div class="metric"><span class="metric-label">累计消费</span><strong id="detail-total">¥134.71</strong></div>
+          <div class="metric"><span class="metric-label" id="detail-year-label">本年消费（预计）</span><strong id="detail-yearly">¥606.22</strong></div>
+        </section>
+        <section class="timeline" id="detail-timeline" aria-label="订阅时间线">
+          <article class="timeline-item stop-event" hidden><i class="timeline-dot danger"></i><div><div class="timeline-date">2027.01.31</div><div class="timeline-title">停止自动续费</div></div><div class="timeline-note"></div></article>
+        </section>
+        
+      </div>
+      <footer class="sticky-actions detail-actions"><div id="detail-action-buttons"><button class="primary" data-sheet="update">订阅更新</button><button class="secondary stop-trigger" data-sheet="stop">停止订阅</button></div><button class="delete-link" data-sheet="delete">删除订阅</button></footer>
+    </section>
+
+    <section class="screen" id="statistics" aria-label="统计">
+      <div class="statusbar"><span>23:14</span><span class="status-icons"><small>5G</small><span class="signal"><i></i><i></i><i></i><i></i></span><small>19%</small><span class="battery"><b></b></span></span></div>
+      <header class="appbar"><div class="bar-left"><button class="app-avatar" data-jump="settings" aria-label="打开设置"><span class="mini-logo profile-avatar"></span></button></div><div class="app-title">统计</div><div class="bar-spacer"></div></header>
+      <div class="scroll stats-scroll">
+        <div class="chip-row stat-years"><button class="chip" data-year="2025">2025</button><button class="chip selected" data-year="2026">2026</button></div>
+        <div class="seg-wide"><button class="selected" data-stat-view="trend">⌁ 趋势</button><button data-stat-view="ratio">◔ 占比</button></div>
+        <div id="trend-view">
+          <div class="chip-row stat-categories"><button class="chip">全部</button><button class="chip selected">AI(2)</button><button class="chip">影音(3)</button><button class="chip">云服务(1)</button><button class="chip">其他(1)</button></div>
+          <div class="summary-grid"><div class="summary-card"><span>本年已支出</span><strong>¥196.41</strong><small>按本年订阅</small></div><div class="summary-card"><span>全年预计</span><strong>¥436.96</strong><small>含未来月预计</small></div><div class="summary-card"><span>月均成本</span><strong>¥61.47</strong><small>当年实际订阅</small></div></div>
+          <section class="chart-card dark"><div class="chart-head"><strong>年度支出趋势</strong><span>¥ · AI</span></div><p class="chart-help">按实际订阅付款日期统计，未来月份为预测</p><div class="year-chart"><div class="year-bar"><b>¥0</b><span>2025</span></div><div class="year-bar current"><b>¥436.96</b><span>2026</span></div></div></section>
+          <section class="chart-card"><div class="chart-head"><strong>2026年 月度支出</strong><span>¥ · AI</span></div><p class="chart-help">按实际订阅付款日期统计，未来月份为预测</p><div class="month-chart"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></section>
+        </div>
+        <div id="ratio-view" hidden>
+          <section class="ratio-card dark"><div class="ratio-head"><h2>2026年 分类占比</h2><span>年度总计 ¥969.08</span></div><p class="ratio-help">* 按实际扣费/付款日期统计（手动续费计入付款月），未来月份为预测</p><div class="donut" role="img" aria-label="年度分类占比：AI 42.5%，影音 26.3%，云服务 17.2%，其他 14.0%"></div><div class="ratio-legend"><div class="legend-row" style="--legend:#695dff"><i></i><span>AI</span><span>2项</span><span>42.5%</span><strong>¥436.96</strong></div><div class="legend-row" style="--legend:#ff696c"><i></i><span>影音</span><span>2项</span><span>26.3%</span><strong>¥270.00</strong></div><div class="legend-row" style="--legend:#48b4d0"><i></i><span>云服务</span><span>1项</span><span>17.2%</span><strong>¥177.00</strong></div><div class="legend-row" style="--legend:#aaa"><i></i><span>其他</span><span>1项</span><span>14.0%</span><strong>¥144.00</strong></div></div></section>
+          <section class="ratio-card"><h2>月度分类占比</h2><div class="month-tabs" aria-label="选择月份"><button>1月</button><button>2月</button><button>3月</button><button>4月</button><button>5月</button><button>6月</button><button>7月</button><button>8月</button><button class="selected">9月</button><button>10月</button><button>11月</button><button>12月</button></div><div class="month-summary"><span id="ratio-month">9月</span>总计 ¥79.14</div><p class="ratio-help">* 按实际扣费/付款日期统计，未来扣费为预测</p><div class="donut monthly" role="img" aria-label="9月分类占比：AI 76.0%，其他 15.2%，影音 8.8%"></div><div class="ratio-legend"><div class="legend-row" style="--legend:#695dff"><i></i><span>AI</span><span>1项</span><span>76.0%</span><strong>¥60.14</strong></div><div class="legend-row" style="--legend:#aaa"><i></i><span>其他</span><span>1项</span><span>15.2%</span><strong>¥12.00</strong></div><div class="legend-row" style="--legend:#ff696c"><i></i><span>影音</span><span>1项</span><span>8.8%</span><strong>¥7.00</strong></div></div></section>
+        </div>
+      </div>
+      <nav class="bottom-nav" aria-label="主导航"><button class="nav-item" data-jump="home"><svg class="icon"><use href="#i-home"/></svg><span>首页</span></button><button class="nav-item active"><svg class="icon"><use href="#i-chart"/></svg><span>统计</span></button><button class="nav-item" data-jump="alternatives"><svg class="icon"><use href="#i-bulb"/></svg><span>平替</span></button></nav>
+    </section>
+
+    <section class="screen" id="alternatives" aria-label="平替">
+      <div class="statusbar"><span>23:14</span><span class="status-icons"><small>5G</small><span class="signal"><i></i><i></i><i></i><i></i></span><small>19%</small><span class="battery"><b></b></span></span></div>
+      <header class="appbar"><div class="bar-left"><button class="app-avatar" data-jump="settings" aria-label="打开设置"><span class="mini-logo profile-avatar"></span></button></div><div class="app-title">平替</div><div class="bar-spacer"></div></header>
+      <div class="scroll alternatives-scroll">
+        <div class="chip-row alt-filters"><button class="chip selected">WPS 会员</button><button class="chip">XSUS</button><button class="chip">Bilibili 大会员</button><button class="chip">Apple Music</button></div>
+        <article class="saving-card"><button aria-label="关闭">×</button><strong>功能重叠</strong><p>你同时订阅了 Antigravity、ChatGPT（同类），二选一每月省 <em>¥1.33</em></p></article>
+        <article class="saving-card"><button aria-label="关闭">×</button><strong>改年付更省</strong><p>Apple Music 改年付，一年省 <em>¥22.88</em>（-17%）</p></article>
+        <h2 class="alt-title">「WPS 会员」的替代方案</h2>
+        <div class="alt-list">
+          <article class="alt-card"><span class="alt-logo">Flow</span><div><div class="alt-name">FlowUs 息流</div><p class="alt-desc">面向个人和小团队的 All-in-one 协作工具，近年增长很快</p><div class="alt-tags"><span>文档协作</span><span>知识库</span><span>项目管理</span><span>AI 助手</span></div></div><div class="alt-price"><strong>¥18 /人/月</strong><span class="save-pill">省 ¥159/月</span></div></article>
+          <article class="alt-card"><span class="alt-logo">T</span><div><div class="alt-name">腾讯文档</div><p class="alt-desc">中国用户使用广泛，微信和 QQ 场景里的协作办公体验很强</p><div class="alt-tags"><span>多人协作</span><span>云端 Office</span><span>模板丰富</span><span>全品类在线表格</span></div></div><div class="alt-price"><strong>¥18 /人/月</strong><span class="save-pill">省 ¥159/月</span></div></article>
+          <article class="alt-card"><span class="alt-logo" style="color:#37c96d">语</span><div><div class="alt-name">语雀</div><p class="alt-desc">阿里系知识库工具，个人和团队文档沉淀场景都很强</p><div class="alt-tags"><span>知识库</span><span>文档协作</span><span>团队空间</span></div></div><div class="alt-price"><strong>¥20 /人/月</strong><span class="save-pill">省 ¥157/月</span></div></article>
+          <article class="alt-card"><span class="alt-logo" style="color:#5365aa">石</span><div><div class="alt-name">石墨文档</div><p class="alt-desc">轻量的在线文档和表格，适合多人实时协作</p><div class="alt-tags"><span>在线文档</span><span>表格</span><span>团队协作</span></div></div><div class="alt-price"><strong>¥25 /人/月</strong><span class="save-pill">省 ¥152/月</span></div></article>
+        </div>
+      </div>
+      <nav class="bottom-nav" aria-label="主导航"><button class="nav-item" data-jump="home"><svg class="icon"><use href="#i-home"/></svg><span>首页</span></button><button class="nav-item" data-jump="statistics"><svg class="icon"><use href="#i-chart"/></svg><span>统计</span></button><button class="nav-item active"><svg class="icon"><use href="#i-bulb"/></svg><span>平替</span></button></nav>
+    </section>
+
+    <section class="screen" id="add-library" aria-label="添加订阅服务库">
+      <div class="statusbar"><span>23:14</span><span class="status-icons"><small>5G</small><span class="signal"><i></i><i></i><i></i><i></i></span><small>19%</small><span class="battery"><b></b></span></span></div>
+      <header class="appbar"><div class="bar-left"><button class="back-button" data-jump="home" aria-label="返回首页"><svg class="icon"><use href="#i-arrow"/></svg></button></div><div class="app-title">添加订阅</div><div class="bar-spacer"></div></header>
+      <div class="scroll add-scroll">
+        <label class="search-box">⌕<input id="service-search" type="search" placeholder="搜索服务，如 Netflix、Notion、Spotify" aria-label="搜索服务"></label>
+        <div class="chip-row add-categories"><button class="chip selected">全部</button><button class="chip">影音</button><button class="chip">工具效率</button><button class="chip">AI</button><button class="chip">阅读知识</button><button class="chip">生活服务</button></div>
+        <div class="manual-row"><span>没有合适的模板？</span><span class="manual-actions"><button data-add-service="自定义订阅">手动创建</button><button class="ai-button" data-sheet="ai">Pro · AI 识别 ◉</button></span></div>
+        <h2 class="library-title">全部服务</h2>
+        <div class="service-library" id="service-library">
+          <button class="library-item" data-add-service="Kimi"><span class="library-logo">K</span>Kimi</button><button class="library-item" data-add-service="文心一言"><span class="library-logo">du</span>文心一言</button>
+          <button class="library-item" data-add-service="通义千问"><span class="library-logo">✦</span>通义千问</button><button class="library-item" data-add-service="豆包"><span class="library-logo">豆</span>豆包</button>
+          <button class="library-item" data-add-service="智谱清言"><span class="library-logo">智</span>智谱清言</button><button class="library-item" data-add-service="讯飞星火"><span class="library-logo">火</span>讯飞星火</button>
+          <button class="library-item" data-add-service="海螺AI"><span class="library-logo">◎</span>海螺AI</button><button class="library-item" data-add-service="天工AI"><span class="library-logo">天</span>天工AI</button>
+          <button class="library-item" data-add-service="腾讯元宝"><span class="library-logo">元</span>腾讯元宝</button><button class="library-item" data-add-service="DeepSeek"><span class="library-logo">鲸</span>DeepSeek</button>
+          <button class="library-item" data-add-service="Trae"><span class="library-logo">▣</span>Trae</button><button class="library-item" data-add-service="360智脑"><span class="library-logo">360</span>360智脑</button>
+          <button class="library-item" data-add-service="WPS 会员"><span class="library-logo">W</span>WPS 会员</button><button class="library-item" data-add-service="Telegram Premium"><span class="library-logo">➤</span>Telegram Premium</button>
+          <button class="library-item" data-add-service="Apple Music"><span class="library-logo">♪</span>Apple Music</button><button class="library-item" data-add-service="Netflix"><span class="library-logo">N</span>Netflix</button>
+          <button class="library-item" data-add-service="Xbox Game Pass"><span class="library-logo">X</span>Xbox Game Pass</button><button class="library-item" data-add-service="PlayStation Plus"><span class="library-logo">PS</span>PlayStation Plus</button>
+          <button class="library-item" data-add-service="Steam"><span class="library-logo">S</span>Steam</button><button class="library-item" data-add-service="Discord Nitro"><span class="library-logo">D</span>Discord Nitro</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="add-form" aria-label="添加订阅表单">
+      <div class="statusbar"><span>23:14</span><span class="status-icons"><small>5G</small><span class="signal"><i></i><i></i><i></i><i></i></span><small>19%</small><span class="battery"><b></b></span></span></div>
+      <header class="appbar"><div class="bar-left"><button class="back-button" data-jump="add-library" aria-label="返回服务库"><svg class="icon"><use href="#i-arrow"/></svg></button></div><div class="app-title">添加订阅</div><div class="bar-spacer"></div></header>
+      <div class="scroll add-scroll">
+        <section class="add-form-card">
+          <div class="service-editor"><button class="library-logo" id="add-logo" data-icon-target="add" aria-label="选择订阅图标">➤</button><div><input id="add-name" aria-label="订阅名称" maxlength="60" placeholder="订阅名称"><div class="editor-price"><input id="add-price" type="number" min="0" max="99999999" step="0.01" value="0" aria-label="订阅价格"><button id="add-currency" data-picker="add-currency">CNY⌄</button></div></div><div class="editor-options"><button id="add-category" data-picker="add-category">其他分类⌄</button><button id="add-color" data-color-target="add"><i class="color-dot"></i><span>#D97757</span>⌄</button></div></div>
+          <div class="form-row"><span>续费方式</span><span class="seg add-renew"><button class="selected" data-renew-mode="auto">自动扣费</button><button data-renew-mode="manual">手动续费</button></span></div>
+          <div class="form-row" id="add-cycle-row"><span>扣费周期</span><button id="add-cycle" data-picker="add-cycle">每月⌄</button></div>
+          <div class="form-row" id="add-duration-row" hidden><span>购买时长</span><span><input id="add-duration" type="number" min="1" max="1200" value="1" aria-label="购买时长"> 月</span></div>
+          <div class="form-row" id="add-trial-row"><span>试用优惠</span><span class="trial-fields"><span>前</span><input id="add-trial-count" type="number" min="0" max="1200" placeholder="n" aria-label="优惠时长"><select id="add-trial-unit" aria-label="优惠时长单位"><option>月</option><option>天</option></select><input id="add-trial-price" type="number" min="0" step="0.01" placeholder="0.00" aria-label="优惠价格"></span></div>
+          <label class="form-row"><span>开始时间</span><input id="add-start" type="date" value="2026-09-01" aria-label="开始时间"></label>
+          <div class="form-row"><span>到期通知</span><button class="switch" id="add-notify" aria-label="到期通知" aria-pressed="false"></button></div>
+        </section>
+        <section class="add-form-card" style="margin-top:9px"><div class="form-row"><span>备注</span></div><textarea class="note-area" id="add-note" aria-label="备注" placeholder="添加备注信息..."></textarea></section>
+        <p id="add-error" class="form-error" role="alert"></p><div class="add-form-actions"><button class="primary" data-save-add="done">添加订阅</button><button class="secondary" data-save-add="continue">保存并继续添加</button></div>
+      </div>
+    </section>
+
+    <section class="screen" id="settings" aria-label="设置">
+      <div class="statusbar"><span>23:14</span><span class="status-icons"><small>5G</small><span class="signal"><i></i><i></i><i></i><i></i></span><small>19%</small><span class="battery"><b></b></span></span></div>
+      <header class="appbar"><div class="bar-left"><button class="back-button" data-jump="home" aria-label="返回首页"><svg class="icon"><use href="#i-arrow"/></svg></button></div><div class="app-title">设置</div><div class="bar-spacer"></div></header>
+      <div class="scroll settings-scroll">
+        <section class="settings-card"><span class="profile-avatar"></span><div><button class="profile-name" data-sheet="nickname">点击设置昵称</button><div class="profile-level">免费版</div></div><button class="pro-pill" data-sheet="pro">· 解锁 Pro ›</button></section>
+        <section class="settings-group">
+          <button class="row-button" data-picker="display-currency"><span>显示货币种类</span><span class="settings-value" id="display-currency-label">¥ 人民币 <span class="chevron">›</span></span></button>
+          <div class="settings-row"><span>显示已过期订阅</span><button class="switch on" data-setting="expired" aria-label="显示已过期订阅" aria-pressed="true"></button></div>
+          <div class="settings-row"><span>单独显示已过期</span><button class="switch" data-setting="separate" aria-label="单独显示已过期" aria-pressed="false"></button></div>
+          <button class="row-button" data-picker="sort"><span>订阅列表排序</span><span class="settings-value sort-label">新添加排在上方 <span class="chevron">›</span></span></button>
+          <div class="settings-row"><span>订阅列表布局方式</span><span class="seg"><button class="selected" data-layout="normal">正常</button><button data-layout="compact">紧凑</button></span></div>
+        </section>
+        <section class="settings-group"><div class="settings-row"><span>订阅到期通知</span><span class="pro-label">Pro</span><button class="switch" aria-label="订阅到期通知" aria-pressed="false"></button></div></section>
+        <section class="settings-group">
+          <button class="row-button" data-jump="orders"><span>订单记录</span><span class="settings-value">查看支付与退款 <span class="chevron">›</span></span></button>
+          <button class="row-button" data-sheet="feedback"><span>用户反馈</span><span class="settings-value">建议采纳送 Pro <span class="chevron">›</span></span></button>
+          <button class="row-button" data-sheet="export"><span>导出订阅列表</span><span class="settings-value">发送 JSON 附件到邮箱 <span class="chevron">›</span></span></button>
+          <button class="row-button" data-sheet="logic"><span>产品逻辑说明</span><span class="settings-value">首页概览的计算方式 <span class="chevron">›</span></span></button>
+          <button class="row-button" data-sheet="rates"><span>汇率更新与折算规则</span><span class="settings-value">手动维护 / 联网同步 <span class="chevron">›</span></span></button>
+        </section>
+      </div>
+    </section>
+
+    <div class="overlay" id="update-overlay" role="dialog" aria-modal="true" aria-labelledby="update-title">
+      <section class="sheet medium">
+        <h2 class="sheet-title" id="update-title">订阅更新</h2>
+        <div class="sheet-row"><span>原价格</span><span class="sheet-value" id="update-original">$20 · 美元 · 每月</span></div>
+        <div class="sheet-row"><span>生效方式</span><span class="seg update-mode"><button class="selected" data-mode="next">下个账期起</button><button data-mode="now">立即生效（补差价）</button></span></div>
+        <label class="sheet-row"><span>新价格</span><span><input class="price-input" id="new-price" type="number" min="0" step="0.01" value="30" aria-label="新价格"> <span class="update-symbol">$</span></span></label>
+        <div class="sheet-row"><span>货币</span><button class="sheet-value" id="update-currency" data-picker="update-currency">$ 美元⌄</button></div>
+        <div class="sheet-row"><span>扣费周期</span><button class="sheet-value" id="update-cycle" data-picker="update-cycle">每月⌄</button></div>
+        <div class="sheet-row next-fields"><span>生效周期</span><button class="sheet-value" id="update-month" data-picker="update-month">2026年10月⌄</button></div>
+        <div class="sheet-row next-fields"><span>生效日</span><span class="sheet-value" id="update-effective">2026.10.01</span></div>
+        <div class="now-fields" hidden>
+          <div class="sheet-row"><span>升级日期</span><input class="sheet-value" id="upgrade-date" type="date" value="2026-09-01" aria-label="升级日期"></div>
+          <div class="sheet-row"><span>扣费日</span><span class="seg anchor-mode"><button class="selected" data-anchor="keep">保持原扣费日</button><button data-anchor="reset">从升级日重新计费</button></span></div>
+          <p class="sheet-help" id="anchor-help">保持原扣费日，下次扣费 2026.10.01</p>
+          <div class="sheet-row"><span>补差价金额</span><span><input id="upgrade-difference" class="price-input" type="number" min="0" step="0.01" value="0" aria-label="补差价金额"> <span class="update-symbol">$</span></span></div>
+        </div>
+        <p id="update-error" class="form-error" role="alert"></p><div class="sheet-actions"><button class="secondary" data-close>取消</button><button class="primary" id="confirm-update">确认更新</button></div>
+      </section>
+    </div>
+
+    <div class="overlay" id="stop-overlay" role="dialog" aria-modal="true" aria-labelledby="stop-title">
+      <section class="sheet small">
+        <h2 class="sheet-title" id="stop-title">停止订阅</h2>
+        <p class="sheet-help" style="text-align:center;margin-top:-6px">选择最后一个付费账期，到期后将不再自动续费</p>
+        <div class="sheet-row"><span>最后付费账期</span><button class="sheet-value" id="stop-month" data-picker="stop-month">2026年9月⌄</button></div>
+        <div class="sheet-row"><span>到期日</span><strong id="stop-expiry" style="font-size:12px">2026.09.30</strong></div>
+        <p id="stop-error" class="form-error" role="alert"></p><div class="sheet-actions"><button class="secondary" data-close>取消</button><button class="primary danger-button" id="confirm-stop">确认停止</button></div>
+      </section>
+    </div>
+
+    <div class="overlay dialog-wrap" id="export-overlay" role="dialog" aria-modal="true" aria-labelledby="export-title">
+      <section class="dialog export-dialog" style="position:relative"><button class="close-x" data-close aria-label="关闭">×</button><div class="dialog-content"><h2 class="dialog-title" id="export-title">导出订阅列表</h2><p class="dialog-text" style="margin-top:7px">会将你的订阅列表整理为 JSON 附件并发送到邮箱。</p><label class="field-label" for="email">邮箱地址（必填）</label><input class="email-input" id="email" type="email" autocomplete="email"><button class="primary export-submit" id="export-submit">发送导出邮件</button></div></section>
+    </div>
+
+    <div class="overlay dialog-wrap" id="delete-overlay" role="alertdialog" aria-modal="true" aria-labelledby="delete-title">
+      <section class="dialog"><div class="dialog-content"><h2 class="dialog-title" id="delete-title">警告：该操作不可撤销</h2><p class="dialog-text">该订阅数据将被永久删除，且不出现在统计信息中。如果后续可能恢复订阅，请使用「停止订阅」功能。</p></div><div class="dialog-actions"><button data-close>取消</button><button id="confirm-delete">仍要删除</button></div></section>
+    </div>
+
+    <section class="screen" id="orders" aria-label="订单记录">
+      <div class="statusbar"><span>23:14</span></div><header class="appbar"><button class="back-button" data-jump="settings" aria-label="返回设置"><svg class="icon"><use href="#i-arrow"/></svg></button><div class="app-title">订单记录</div><div class="bar-spacer"></div></header><div class="empty-state">暂无订单记录</div>
+    </section>
+    <div class="overlay" id="picker-overlay" role="dialog" aria-modal="true" aria-labelledby="picker-title"><section class="sheet picker-sheet"><h2 class="sheet-title" id="picker-title"></h2><div id="picker-options" class="picker-list"></div><div class="picker-footer"><button class="secondary" data-close>取消</button><button class="primary" id="picker-confirm">确定</button></div></section></div>
+    <div class="overlay" id="renew-overlay" role="dialog" aria-modal="true" aria-labelledby="renew-title"><section class="sheet"><h2 class="sheet-title" id="renew-title">添加续费记录</h2><div class="sheet-row"><span>货币</span><button id="renew-currency" class="sheet-value" data-picker="renew-currency">¥ 人民币⌄</button></div><label class="sheet-row"><span>续费金额</span><input id="renew-price" class="price-input" type="number" min="0" step="0.01" value="0" aria-label="续费金额"></label><div class="sheet-row"><span>续费时长</span><span><input id="renew-duration" class="price-input" type="number" min="1" max="1200" placeholder="n" aria-label="续费时长"><select id="renew-unit" aria-label="续费时长单位"><option value="month">月</option><option value="day">天</option><option value="year">年</option></select></span></div><label class="sheet-row"><span>续费日期</span><input id="renew-date" type="date" value="2026-09-01" aria-label="续费日期"></label><p class="form-error" id="renew-error" role="alert"></p><div class="sheet-actions"><button class="secondary" data-close>取消</button><button class="primary" id="confirm-renew">确认续费</button></div></section></div>
+    <div class="overlay" id="icons-overlay" role="dialog" aria-modal="true" aria-labelledby="icons-title"><section class="sheet"><button class="close-x" data-close aria-label="关闭图标选择">×</button><h2 id="icons-title" class="sheet-title">选择图标</h2><div class="seg-wide icon-tabs"><button class="selected" data-icon-tab="icons">图标</button><button data-icon-tab="brands">品牌</button></div><div class="chip-row icon-categories"><button class="chip selected">品牌标识</button><button class="chip">金融支付</button><button class="chip">购物服务</button><button class="chip">天气自然</button><button class="chip">动物</button></div><label class="search-box"><input id="icon-search" aria-label="搜索图标" placeholder="搜索图标，如 calendar / wallet / camera"></label><div class="icon-grid" id="icon-grid"></div></section></div>
+    <div class="overlay" id="color-overlay" role="dialog" aria-modal="true" aria-labelledby="color-title"><section class="sheet"><h2 id="color-title" class="sheet-title">卡片颜色</h2><div class="color-grid" id="color-grid"></div><label class="sheet-row">自定义颜色<input id="custom-color" type="color" value="#d97757"></label><div class="picker-footer"><button class="secondary" data-close>取消</button><button class="primary" id="confirm-color">确定</button></div></section></div>
+    <div class="overlay dialog-wrap" id="logic-overlay" role="dialog" aria-modal="true" aria-labelledby="logic-title"><section class="dialog" style="position:relative"><button class="close-x" data-close aria-label="关闭说明">×</button><div class="dialog-content"><h2 class="dialog-title" id="logic-title">首页概览说明</h2><h3>「每月」— 月均预估</h3><p class="dialog-text">将你所有正在生效的订阅，按各自的付费周期折算为每月金额后求和。例如年付 120 元的服务按 10 元/月计入。它反映的是“如果所有订阅持续生效，我每个月大概花多少钱”。</p><h3>「每年」— 年度实际支出</h3><p class="dialog-text">统计从今年 1 月 1 日到当前日期，每个订阅实际已经产生的扣费金额之和。只计算已到期的账单周期，尚未扣费的不计入。它反映的是“今年到目前为止，我实际花了多少钱”。</p></div></section></div>
+    <div class="overlay dialog-wrap" id="rates-overlay" role="dialog" aria-modal="true" aria-labelledby="rates-title"><section class="dialog" style="position:relative"><button class="close-x" data-close aria-label="关闭汇率设置">×</button><div class="dialog-content"><h2 class="dialog-title" id="rates-title" style="text-align:left">汇率更新与折算规则</h2><div style="margin-bottom:8px;font-size:12px;color:var(--text-muted,#888)">更新模式：<span class="tag" style="background:rgba(105,93,255,0.15);color:#695DFF;font-size:11px;padding:2px 6px;border-radius:4px">初期手动维护 · 后期联网同步</span></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px"><label style="font-size:11px">1 美元 (USD)<input class="email-input" id="and-rate-usd" type="number" step="0.0001" value="6.7829"></label><label style="font-size:11px">1 日元 (JPY)<input class="email-input" id="and-rate-jpy" type="number" step="0.0001" value="0.0422"></label><label style="font-size:11px">1 欧元 (EUR)<input class="email-input" id="and-rate-eur" type="number" step="0.0001" value="7.8267"></label><label style="font-size:11px">1 英镑 (GBP)<input class="email-input" id="and-rate-gbp" type="number" step="0.0001" value="9.1278"></label></div><div style="background:rgba(128,128,128,0.08);border-radius:6px;padding:6px 8px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center"><span style="font-size:11px;color:#888" id="and-rate-sync-status">缓存：2026-09-03 中间价</span><button class="row-button" id="and-btn-fetch-rates" style="width:auto;padding:3px 6px;font-size:11px;border:1px solid #ccc;border-radius:4px">⚡ 联网拉取</button></div><div style="background:rgba(128,128,128,0.06);border:1px dashed rgba(128,128,128,0.3);border-radius:6px;padding:8px;font-size:11px;line-height:1.5;color:#777;margin-bottom:10px"><strong>ℹ 汇率折算说明：</strong>外币订阅统一按汇率折算为人民币计入月均与预算；修改汇率即时重算未来账期，历史扣费保持原值。</div><div style="display:flex;justify-content:space-between;gap:8px"><button class="secondary" id="and-btn-reset-rates" style="font-size:11px">恢复默认</button><button class="primary export-submit" id="and-save-rates" style="margin:0">保存并应用</button></div></div></section></div>
+    <div class="overlay dialog-wrap" id="nickname-overlay" role="dialog" aria-modal="true" aria-label="设置昵称"><section class="dialog"><div class="dialog-content"><h2 class="dialog-title">设置昵称</h2><input id="nickname" class="email-input" maxlength="30" aria-label="昵称"><button class="primary export-submit" id="save-nickname">保存</button></div></section></div>
+    <div class="overlay dialog-wrap" id="notice-overlay" role="dialog" aria-modal="true" aria-labelledby="notice-title"><section class="dialog" style="position:relative"><button class="close-x" data-close aria-label="关闭提示">×</button><div class="dialog-content"><h2 class="dialog-title" id="notice-title"></h2><div class="dialog-text" id="notice-content"></div></div></section></div>
+    <div class="toast" id="toast" role="status" aria-live="polite"><div class="toast-check" hidden></div><span></span></div>
+  </main>
+
+  <script>
+    // Recording fixtures, not live prices or a production billing engine.
+    const subscriptions = {
+      claude: { name:'Claude', logo:'A⌁', logoClass:'claude-logo', category:'AI', price:'$20 USD', cycle:'每月 · 自动扣费', nextLabel:'下次扣费日 · 30天后', next:'2026.10.01', monthly:'¥134.71', total:'¥134.71', yearly:'¥606.22', start:'2026.09.01', color:'#D97757', note:'$20 · 美元 · 月付', promo:true, future:[['2026.10.01','订阅更新','$20 · 美元 · 月付 → $30 · 美元 · 月付','future'],['2026.12.01','优惠结束','恢复 $20 · 美元 · 月付','hollow']] },
+      wps: { name:'WPS 会员', logo:'W', logoClass:'wps-logo', category:'云服务', price:'¥177 CNY', cycle:'三年 · 已付费', nextLabel:'到期日 · 约34个月后', next:'2029.07.25', monthly:'¥4.92', total:'¥177.00', yearly:'¥59.00', start:'2026.07.26', color:'#E64F20', note:'¥177 · 人民币 · 三年付' },
+      xsus: { name:'XSUS', logo:'▰', logoClass:'xsus-logo', category:'其他', price:'¥12 CNY', cycle:'每月 · 自动扣费', nextLabel:'下次扣费日 · 17天后', next:'2026.09.18', monthly:'¥12.00', total:'¥96.00', yearly:'¥144.00', start:'2026.01.18', color:'#D64453', note:'¥12 · 人民币 · 月付' },
+      bilibili: { name:'Bilibili 大会员', logo:'▣', logoClass:'bili-logo', category:'影音', price:'¥0 CNY', cycle:'限时免费 · 到期停止', nextLabel:'到期日 · 30天后', next:'2026.10.01', monthly:'¥0.00', total:'¥0.00', yearly:'¥0.00', start:'2026.08.02', color:'#19A9D2', note:'¥0 · 人民币 · 试用' },
+      apple: { name:'Apple Music', logo:'♪', logoClass:'apple-logo', category:'影音', price:'¥7 CNY', cycle:'每月 · 自动扣费', nextLabel:'下次扣费日 · 28天后', next:'2026.09.29', monthly:'¥7.00', total:'¥42.00', yearly:'¥84.00', start:'2026.03.29', color:'#EF4055', note:'¥7 · 人民币 · 月付' },
+      anti: { name:'Antigravity', logo:'●', logoClass:'anti-logo', category:'AI', price:'¥16 CNY', cycle:'每年 · 自动扣费', nextLabel:'下次扣费日 · 302天后', next:'2027.06.30', monthly:'¥1.33', total:'¥16.00', yearly:'¥16.00', start:'2026.06.30', color:'#4F7EE9', note:'¥16 · 人民币 · 年付' }
+    };
+    Object.assign(subscriptions, {
+      tencent: { name:'腾讯视频', logo:'▶', category:'影音', price:'¥200 CNY', cycle:'每年 · 自动扣费', nextLabel:'下次扣费日 · 38天后', next:'2026.10.09', monthly:'¥16.67', total:'¥200.00', yearly:'¥200.00', start:'2025.10.09', color:'#FFAE35', note:'¥200 · 人民币 · 年付' },
+      chatgpt: { name:'ChatGPT', logo:'◎', category:'AI', price:'¥1430 JPY', cycle:'每月 · 自动扣费', nextLabel:'下次扣费日 · 21天后', next:'2026.09.22', monthly:'¥60.35', total:'¥120.69', yearly:'¥362.09', start:'2026.07.22', color:'#10A37F', note:'¥2860 · 日元 · 月付', future:[['2026.08.01','套餐升级','即日起按 ¥1430/月 扣费','future'],['2026.09.22','下次扣费','¥1430 · 日元 · 月付','hollow']] }
+    });
+    Object.assign(subscriptions.wps, {manual:true, color:'#D4252B', cycle:'手动续费', yearly:'¥25.68', nextLabel:'到期日 · 1058天后', note:'¥177 · 人民币 · 36个月'});
+    Object.assign(subscriptions.bilibili, {manual:true, cycle:'手动续费'});
+    const currencyNames = { CNY:'¥ 人民币', USD:'$ 美元', EUR:'€ 欧元', GBP:'£ 英镑', JPY:'¥ 日元', HKD:'HK$ 港币', TWD:'NT$ 新台币', KRW:'₩ 韩元', SGD:'S$ 新加坡元', MYR:'RM 马来西亚林吉特', AUD:'A$ 澳元', CAD:'C$ 加拿大元', CHF:'CHF 瑞士法郎', INR:'₹ 印度卢比', RUB:'₽ 俄罗斯卢布', BRL:'R$ 巴西雷亚尔', ARS:'AR$ 阿根廷比索', SEK:'kr 瑞典克朗', NOK:'kr 挪威克朗', SAR:'﷼ 沙特里亚尔', ILS:'₪ 以色列新谢克尔', EGP:'E£ 埃及镑' };
+    const cycleNames = {1:'每月',3:'每季',6:'每半年',12:'每年'};
+    const categoryColors = {'AI':'#695dff','影音':'#ff696c','云服务':'#48b4d0','其他':'#a5a5a5'};
+    const categories = ['影音','工具效率','AI','阅读知识','生活服务','云服务','游戏','社交','其他'];
+    const libraryGroups = {
+      'AI':'Kimi|文心一言|通义千问|豆包|智谱清言|讯飞星火|海螺AI|天工AI|腾讯元宝|DeepSeek|Trae|360智脑|百川智能|CodeGeeX|阶跃星辰|可灵AI|即梦AI|Vidu|MiniMax|Coze',
+      '影音':'Bilibili 大会员|爱奇艺|优酷|腾讯视频|芒果TV|QQ音乐|网易云音乐|酷狗音乐|酷我音乐|咪咕视频|汽水音乐|小宇宙|红果短剧',
+      '工具效率':'滴答清单|FlowUs 息流|有道云笔记|石墨文档|幕布|扫描全能王|剪映|夸克网盘|迅雷|腾讯会议|QQ邮箱会员|苹果开发者|力扣会员|美图秀秀|Nexitally|Flomo|UU加速器|沉浸式翻译|微信读书',
+      '阅读知识':'得到|QQ阅读|喜马拉雅|帆书|知识星球|知乎盐选会员|快看漫画|腾讯动漫|洪恩识字|宝宝巴士|斑马AI学|番茄小说',
+      '生活服务':'饿了么会员|美团会员|京东PLUS|淘宝88VIP|山姆会员|滴滴出行会员|携程超级会员|盒马会员|彩云天气|哈啰单车|英语流利说|扇贝单词',
+      '云服务':'腾讯云|阿里云|华为云|百度智能云|火山引擎',
+      '游戏':'原神月卡|崩坏：星穹铁道月卡',
+      '社交':'Weibo会员|陌陌会员',
+      '其他':'Keep 会员|WPS 会员|百度网盘|阿里云盘'
+    };
+    const extraLibrary = {
+      'AI':'ChatGPT|Claude|Gemini|Midjourney|GitHub Copilot|Notion AI|Cursor|Perplexity|Poe|Jasper|Grammarly Premium|Adobe Firefly|Windsurf|Zed|Antigravity|DeepL Pro|Monica|Replit|Luma AI|Stability AI|Grok|Groq|Microsoft Copilot|ElevenLabs|Flowith|Ideogram|Krea|Lovable|Manus|NotebookLM|Phind|Pika|Recraft|Runway|Suno|v0|OpenRouter|Google Colab|LangSmith|Langfuse|Haiper|PixVerse',
+      '影音':'Netflix|YouTube|Spotify|Apple Music|Disney+|HBO|Amazon Prime Video|Apple TV+|Hulu|Paramount+|Peacock|Tidal|Deezer|SoundCloud Go+',
+      '工具效率':'Notion|Todoist|1Password|LastPass|Dropbox|Google One|iCloud+|Microsoft 365|Adobe Creative Cloud|Figma|Canva|Slack|Zoom|Linear|Obsidian Sync|Evernote|Bear|Setapp|CleanMyMac|Fantastical|Things 3|Craft|Raindrop.io|Tello|Typeless',
+      '阅读知识':'Kindle Unlimited|Medium|The Information|华尔街日报|纽约时报|Readwise|Pocket Premium|Instapaper Pro',
+      '云服务':'AWS|Google Cloud|Azure|Vercel|Netlify|DigitalOcean|Cloudflare|Heroku|Railway|Supabase Pro|PlanetScale',
+      '游戏':'Xbox Game Pass|PlayStation Plus|Nintendo Switch Online|Steam|EA Play|Apple Arcade',
+      '社交':'Twitter/X Premium|Discord Nitro|Telegram Premium|LinkedIn Premium|Reddit Premium',
+      '其他':'Costco会员|ExpressVPN|NordVPN|Surfshark|Namecheap 域名|GoDaddy 域名|Cloudflare 域名|Duolingo Plus|Strava|Headspace|Calm'
+    };
+    const library = Object.entries(libraryGroups).concat(Object.entries(extraLibrary)).flatMap(([category,names]) => names.split('|').map(name => ({name,category})));
+    const altData = {
+      wps:[['FlowUs 息流','¥18 /人/月','面向个人和小团队的 All-in-one 协作工具，近年增长很快','文档协作|知识库|项目管理|AI 助手','省 ¥159/月'],['腾讯文档','¥18 /人/月','中国用户使用广泛，微信和 QQ 场景里的协作办公体验很强','多人协作|云端 Office|模板丰富','省 ¥159/月'],['语雀','¥20 /人/月','阿里系知识库工具，个人和团队文档沉淀场景都很强','知识库|文档协作|团队空间','省 ¥157/月'],['百度文库','¥25 /月','海量文档和资料，覆盖学习与办公场景','文档资料|模板|AI 助手','省 ¥152/月']],
+      xsus:[['Surfshark','$12.95 /月','不限设备数，全家使用性价比很高','无限设备|隐私保护|CleanWeb|GPS 伪装','贵 ¥75.23/月'],['NordVPN','$12.99 /月','双重加密 + 威胁防护，安全性最强','双重加密|5500+节点|威胁防护|暗网监控','贵 ¥75.50/月'],['Nexitally','¥99 /月','稳定的网络代理工具，节点覆盖高','高速节点|多设备连接|稳定连接','贵 ¥87/月']],
+      bilibili:[['咪咕视频','18/月','体育赛事版权最全，中超英超独家直播','体育赛事|中超英超|4K HDR|移动权益联动',''],['芒果TV','22/月','湖南卫视综艺独播，国产综艺看这里就够了','湖南卫视独播|综艺王牌|自制剧|性价比高',''],['爱奇艺','25/月','热播剧综首选，4K 杜比视听体验好','热播剧综|4K 杜比|奇异果TV|自制综艺',''],['优酷','25/月','阿里影业资源丰富，港剧经典库存大','阿里影业资源|港剧经典|优酷自制|酷喵TV',''],['腾讯视频','25/月','视频会员服务','影视剧|综艺|动漫','']],
+      apple:[['SoundCloud Go+','$9.99 /月','独立音乐和 DJ 混音内容最丰富','独立音乐人|混音/DJ内容|离线收听|社区互动','贵 ¥60.29/月'],['Tidal','$10.99 /月','HiFi 发烧友首选，杜比全景声音质顶级','HiFi无损音质|杜比全景声|独家首发|艺术家直播','贵 ¥67.03/月'],['Deezer','$10.99 /月','全球曲库 + 无损 FLAC，Flow 推荐很懂你','全球曲库|无损 FLAC|歌词同步|Flow 推荐','贵 ¥67.03/月'],['Spotify','$11.99 /月','全球最大曲库融合顶级个性化推荐算法','全球最大曲库|个性化推荐|播客整合','贵 ¥73.76/月']]
+    };
+    // The recordings predate Claude for these charts; preserve their independent 7-subscription snapshot.
+    const statRows = [
+      {name:'ChatGPT',category:'AI',paid:12069,monthly:60.35,values:[0,0,0,0,0,0,12069,0,6035,6035,6035,6034]},
+      {name:'Antigravity',category:'AI',paid:1600,monthly:1.33,values:[0,0,0,0,0,1600,0,0,0,0,0,0]},
+      {name:'Apple Music',category:'影音',paid:4200,monthly:7,values:[0,0,700,700,700,700,700,700,700,700,700,700]},
+      {name:'腾讯视频',category:'影音',paid:0,monthly:16.67,values:[0,0,0,0,0,0,0,0,0,20000,0,0]},
+      {name:'WPS 会员',category:'云服务',paid:17700,monthly:4.92,values:[0,0,0,0,0,0,17700,0,0,0,0,0]},
+      {name:'XSUS',category:'其他',paid:9600,monthly:12,values:Array(12).fill(1200)}
+    ];
+    function money(cents) { return '¥' + (cents / 100).toFixed(2); }
+    function escapeHtml(value) { return String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    function dateString(date) { return date.toISOString().slice(0,10); }
+    function validDate(value) { const date = new Date(value + 'T00:00:00Z'); return /^\d{4}-\d{2}-\d{2}$/.test(value) && Number.isFinite(+date) && dateString(date) === value; }
+    function addMonths(value, count) {
+      const date = new Date(value + 'T00:00:00Z'), day = date.getUTCDate();
+      date.setUTCDate(1); date.setUTCMonth(date.getUTCMonth() + Number(count));
+      date.setUTCDate(Math.min(day, new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth()+1,0)).getUTCDate()));
+      return dateString(date);
+    }
+    function monthEnd(month) { const [year,n] = month.split('-').map(Number); return dateString(new Date(Date.UTC(year,n,0))); }
+    function cycleDate(month, start) { return month + '-' + String(Math.min(Number(start.slice(-2)),Number(monthEnd(month).slice(-2)))).padStart(2,'0'); }
+    function amountInput(value) { return value.trim() !== '' && Number.isFinite(Number(value)) && Number(value) >= 0 && Number(value) <= 99999999; }
+    function rowsFor(year, category='全部') {
+      const rows = year === 2025 ? [{name:'腾讯视频',category:'影音',paid:20000,monthly:16.67,values:[0,0,0,0,0,0,0,0,0,20000,0,0]}] : statRows;
+      return rows.filter(row => category === '全部' || row.category === category);
+    }
+    function summarize(year, category='全部', month=null) {
+      return rowsFor(year,category).map(row => ({...row,amount: month === null ? row.values.reduce((a,b)=>a+b,0) : row.values[month-1]})).filter(row=>row.amount>0);
+    }
+
+    // DOM: all edits stay in memory; refresh restores the recorded fixtures.
+    const $ = selector => document.querySelector(selector);
+    const $$ = selector => [...document.querySelectorAll(selector)];
+    let currentId = 'claude', overviewMode = 0, selectedYear = 2026, statCategory = '全部', ratioMonth = 9;
+    let addDraft = {}, updateDraft = {}, renewCurrency = 'CNY', displayCurrency = 'CNY', sortMode = '新添加排在上方', compact = false;
+    let colorTarget = 'detail', iconTarget = 'detail', activeIconTab = 'icons', picker = null, toastTimer, overlayStack = [], returnFocus = null;
+    let libraryCategory = '全部', altId = 'wps';
+    Object.entries(subscriptions).forEach(([id,item],index) => {
+      item.id=id; item.order=index; item.amount=Number(item.price.match(/[\d.]+/)[0]); item.currency=item.price.slice(-3);
+      item.months=id==='wps'?36:id==='anti'||id==='tencent'?12:1;
+      item.icon = id==='claude' ? null : id;
+    });
+    const brandIcons = {'FlowUs 息流':'flowus','腾讯文档':'docs','语雀':'yuque','百度文库':'baidu','Surfshark':'surfshark','NordVPN':'nordvpn','Nexitally':'nexitally','咪咕视频':'migu','芒果TV':'mango','爱奇艺':'iqiyi','优酷':'youku','SoundCloud Go+':'soundcloud','Tidal':'tidal','Deezer':'deezer','Spotify':'spotify','Telegram Premium':'telegram'};
+    Object.assign(brandIcons, {'Kimi':'kimi','文心一言':'baidu','通义千问':'qwen','豆包':'doubao','智谱清言':'zhipu','讯飞星火':'spark','海螺AI':'hailuo','天工AI':'tiangong','腾讯元宝':'yuanbao','DeepSeek':'deepseek','Trae':'trae','360智脑':'360','百川智能':'baichuan','CodeGeeX':'codegeex','阶跃星辰':'stepfun','可灵AI':'kling','即梦AI':'jimeng','Vidu':'vidu'});
+    const iconHtml = item => item.iconSvg || (item.icon ? '<img src="assets/recording/'+escapeHtml(item.icon)+'.png" alt="">' : '<span>'+escapeHtml(item.logo || item.name.slice(0,1))+'</span>');
+    let rates = { CNY: 1, USD: 6.7829, JPY: 0.0422, EUR: 7.8267, GBP: 9.1278, HKD: 0.8650 };
+    const activeItem = () => subscriptions[currentId];
+    const fmtDate = value => value.replaceAll('-','.');
+    const currencySymbol = code => currencyNames[code].split(' ')[0];
+    const selectButtons = (parent,button) => parent.querySelectorAll('button').forEach(b=>{b.classList.toggle('selected',b===button);b.setAttribute('aria-pressed',b===button);});
+
+    function showToast(message, success=false) {
+      clearTimeout(toastTimer); $('#toast span').textContent=message; $('#toast .toast-check').hidden=!success;
+      $('#toast').classList.add('show'); toastTimer=setTimeout(()=>$('#toast').classList.remove('show'),2200);
+    }
+    function syncModal() {
+      $$('.overlay').forEach(o=>o.classList.toggle('open',o.id===overlayStack.at(-1)));
+      $$('.screen, .review-controls').forEach(s=>s.inert=overlayStack.length>0);
+      if (overlayStack.length) $('#'+overlayStack.at(-1)).querySelector('input,button')?.focus();
+    }
+    function closeOverlays(all=false) {
+      if(all) overlayStack=[]; else overlayStack.pop();
+      syncModal(); if(!overlayStack.length) returnFocus?.focus();
+    }
+    function showView(id) {
+      closeOverlays(true); $$('.screen').forEach(s=>s.classList.toggle('active',s.id===id));
+      $('#'+id+' .scroll')?.scrollTo({top:0});
+      if(id==='home') renderHome();
+      if(id==='statistics') renderStatistics();
+      if(id==='alternatives') renderAlternatives();
+    }
+    function notice(title,text) {
+      $('#notice-title').textContent=title; $('#notice-content').textContent=text; openOverlay('notice');
+    }
+    function openOverlay(name) {
+      const notices = {
+        ai:['AI 识别订阅','录屏只展示了 AI 识别入口，没有展示识别流程。当前原型未接入图片识别，可使用手动创建。'],
+        pro:['解锁 Pro','录屏未展示会员购买页。当前仅还原入口，未接入支付，不会创建订单。'],
+        feedback:['用户反馈','录屏未展示反馈表单。当前原型未接入反馈服务。'],
+        share:['分享概览','录屏未展示分享卡片。当前原型未接入微信分享。']
+      };
+      if(notices[name]) return notice(...notices[name]);
+      if(['update','stop','renew'].includes(name) && !activeItem()) return notice('暂无订阅','请先添加订阅。');
+      if(name==='update') {
+        const item=activeItem();
+        updateDraft={currency:item.currency,months:item.months,month:item.next.slice(0,7).replace('.','-'),mode:'next',anchor:'keep'};
+        $('#update-original').textContent=item.price+' · '+(cycleNames[item.months]||item.months+'个月');
+        $('#new-price').value=0; $('#upgrade-date').value='2026-09-01'; $('#upgrade-difference').value=0;
+        $('#update-error').textContent=''; renderUpdate();
+      }
+      if(name==='stop') {
+        $('#stop-month').dataset.value='2026-09'; $('#stop-month').textContent='2026年9月⌄';
+        $('#stop-expiry').textContent='2026.09.30'; $('#stop-error').textContent='';
+      }
+      if(name==='renew') {
+        renewCurrency=activeItem().currency; $('#renew-currency').textContent=currencyNames[renewCurrency]+'⌄';
+        $('#renew-price').value=0; $('#renew-duration').value=''; $('#renew-error').textContent='';
+      }
+      if(name==='rates') {
+    $('#and-rate-usd').value = rates.USD.toFixed(4);
+    $('#and-rate-jpy').value = rates.JPY.toFixed(4);
+    $('#and-rate-eur').value = rates.EUR.toFixed(4);
+    $('#and-rate-gbp').value = rates.GBP.toFixed(4);
+  }
+      if(!$('#'+name+'-overlay')) return;
+      if(!overlayStack.length) returnFocus=document.activeElement;
+      overlayStack.push(name+'-overlay'); syncModal();
+    }
+    function renderHome() {
+      let items=Object.values(subscriptions);
+      if(sortMode==='新添加排在下方') items.reverse();
+      if(sortMode==='即将到期排在上方') items.sort((a,b)=>a.next.localeCompare(b.next));
+      $('#home .service-list').innerHTML=items.map(item=>'<button class="service-card '+item.id+(compact?' compact':'')+'" data-subscription="'+item.id+'"><span class="service-logo">'+iconHtml(item)+'</span><span class="service-main"><span class="service-name">'+escapeHtml(item.name)+(item.promo?' <span class="promo">优惠中</span>':'')+'</span><span class="service-meta">'+escapeHtml(item.category)+' · '+item.start+' 起</span></span><span class="service-price"><strong>'+currencySymbol(item.currency)+item.amount+'<small>'+escapeHtml(item.manual?'手动续费':item.months===12?'年付':'月付')+'</small></strong><span>'+escapeHtml(item.stopped?'已安排停止':item.nextLabel.replace(/^.*? · /,''))+'</span></span></button>').join('');
+      // ChatGPT's recorded detail shows ¥90.20, while the home overview uses its upgraded ¥60.14 rate.
+      const amounts=[items.reduce((sum,item)=>sum+(item.stopped?0:Number(item.monthly.slice(1))||0),0),969.08+(subscriptions.claude?606.22:0),451.69+(subscriptions.claude?134.71:0)];
+      $('#home .overview-amount strong').textContent='¥'+amounts[overviewMode].toFixed(2);
+      $('#home .overview-amount span').textContent=['月均成本','预计年支出','今年已支出'][overviewMode];
+      $('#home .count-pill').textContent=overviewMode===0?'当前生效 '+items.length+' 项':overviewMode===1?'本年预计支出 31 笔':'本年已支出 18 笔';
+    }
+    function openSubscription(id) {
+      if(!subscriptions[id]) return; currentId=id; renderDetail(); showView('detail');
+    }
+    function renderDetail() {
+      const item=activeItem();
+      $('#detail-logo').innerHTML=iconHtml(item); $('#detail-logo').className='service-logo '+(item.logoClass||'');
+      ['name','price','cycle','next','monthly','total','yearly','color'].forEach(key=>$('#detail-'+key).textContent=item[key]);
+      $('#detail-category').textContent=item.category+' 分类⌄'; $('#detail-next-label').textContent=item.nextLabel;
+      $('#detail-year-label').textContent=item.manual?'本年成本（摊销）':'本年消费（预计）';
+      $('#detail-color-dot').style.background=item.color; $('#detail-hero').style.background='linear-gradient(120deg,'+item.color+'20,#eee6f1)';
+      const toggle=$('#detail .switch'); toggle.classList.toggle('on',!!item.notify); toggle.setAttribute('aria-pressed',!!item.notify);
+      const events=[[item.start,'开始订阅',item.note,''],...(item.future||[[item.next,item.manual?'订阅到期':'下次扣费',item.note,'future']])];
+      if(item.stopped) events.push([fmtDate(item.stopped),'停止自动续费','','danger']);
+      $('#detail-timeline').innerHTML=events.map(([date,title,note,kind],index)=>'<article class="timeline-item"><i class="timeline-dot '+kind+'"></i><div><div class="timeline-date">'+escapeHtml(date)+'</div><div class="timeline-title">'+escapeHtml(title)+(index===0&&item.promo?' <span class="promo-tag">优惠中</span>':'')+'</div></div><div class="timeline-note">'+escapeHtml(note)+'</div></article>'+(index===0&&!item.manual?'<div class="cycle-divider">共 '+(item.id==='chatgpt'?2:1)+' 个计费周期</div>':'')).join('');
+      $('#detail-action-buttons').innerHTML=item.stopped?'<button class="primary" id="cancel-stop">取消停止</button>':item.manual?'<button class="primary" data-sheet="renew">手动续费</button>':'<button class="primary" data-sheet="update">订阅更新</button><button class="secondary" data-sheet="stop">停止订阅</button>';
+    }
+    function renderUpdate() {
+      $('#update-currency').textContent=currencyNames[updateDraft.currency]+'⌄';
+      $$('.update-symbol').forEach(el=>el.textContent=currencySymbol(updateDraft.currency));
+      $('#update-cycle').textContent=(cycleNames[updateDraft.months]||updateDraft.months+'个月')+'⌄';
+      $('#update-cycle').disabled=updateDraft.mode==='now';
+      $('#update-month').textContent=updateDraft.month.replace('-','年')+'月⌄';
+      $('#update-effective').textContent=fmtDate(cycleDate(updateDraft.month,activeItem().start.replaceAll('.','-')));
+      $$('.next-fields').forEach(el=>el.hidden=updateDraft.mode==='now'); $('.now-fields').hidden=updateDraft.mode!=='now';
+      $$('.update-mode button').forEach(b=>b.classList.toggle('selected',b.dataset.mode===updateDraft.mode));
+      $$('.anchor-mode button').forEach(b=>b.classList.toggle('selected',b.dataset.anchor===updateDraft.anchor));
+      $('#anchor-help').textContent=updateDraft.anchor==='keep'?'保持原扣费日，下次扣费 '+activeItem().next:'升级日起重新计费，下次扣费 '+fmtDate(addMonths($('#upgrade-date').value||'2026-09-01',updateDraft.months));
+    }
+    function openPicker(kind) {
+      let values,title,current,apply;
+      if(kind.includes('currency')) {
+        values=Object.entries(currencyNames); title='选择货币';
+        current=kind==='display-currency'?displayCurrency:kind==='add-currency'?addDraft.currency:kind==='renew-currency'?renewCurrency:updateDraft.currency;
+        apply=value=>{
+          if(kind==='display-currency') {displayCurrency=value; $('#display-currency-label').textContent=currencyNames[value]+' ›'; showToast('已选择货币；录屏统计快照仍以人民币展示');}
+          else if(kind==='add-currency') {addDraft.currency=value; $('#add-currency').textContent=value+'⌄';}
+          else if(kind==='renew-currency') {renewCurrency=value; $('#renew-currency').textContent=currencyNames[value]+'⌄';}
+          else {updateDraft.currency=value;renderUpdate();}
+        };
+      } else if(kind.includes('category')) {
+        values=categories.map(c=>[c,c]); title='选择分类'; current=kind==='add-category'?addDraft.category:activeItem().category;
+        apply=value=>{if(kind==='add-category'){addDraft.category=value;$('#add-category').textContent=value+'分类⌄';}else{activeItem().category=value;renderDetail();}};
+      } else if(kind.includes('cycle')) {
+        values=Object.entries(cycleNames);title='扣费周期';current=kind==='add-cycle'?addDraft.months:updateDraft.months;
+        apply=value=>{if(kind==='add-cycle'){addDraft.months=Number(value);$('#add-cycle').textContent=cycleNames[value]+'⌄';}else{updateDraft.months=Number(value);renderUpdate();}};
+      } else if(kind==='sort') {
+        title='订阅列表排序';values=['新添加排在上方','新添加排在下方','即将到期排在上方'].map(v=>[v,v]);current=sortMode;
+        apply=value=>{sortMode=value;$('.sort-label').textContent=value+' ›';renderHome();};
+      } else {
+        title=kind==='stop-month'?'最后付费账期':'生效周期';
+        values=Array.from({length:30},(_,i)=>{const month=addMonths('2026-01-01',i).slice(0,7);return[month,month.replace('-','年')+'月'];});
+        current=kind==='stop-month'?$('#stop-month').dataset.value:updateDraft.month;
+        apply=value=>{
+          if(kind==='stop-month'){$('#stop-month').dataset.value=value;$('#stop-month').textContent=value.replace('-','年')+'月⌄';$('#stop-expiry').textContent=fmtDate(monthEnd(value));}
+          else{updateDraft.month=value;renderUpdate();}
+        };
+      }
+      picker={apply,value:String(current)}; $('#picker-title').textContent=title;
+      $('#picker-options').innerHTML=values.map(([value,label])=>'<button class="picker-item '+(String(value)===String(current)?'selected':'')+'" data-pick="'+escapeHtml(value)+'" aria-pressed="'+(String(value)===String(current))+'">'+escapeHtml(label)+'</button>').join('');
+      openOverlay('picker'); $('#picker-options .selected')?.scrollIntoView({block:'center'});
+    }
+    function renderLibrary() {
+      const query=$('#service-search').value.trim().toLowerCase();
+      const matches=library.filter(item=>(libraryCategory==='全部'||item.category===libraryCategory)&&item.name.toLowerCase().includes(query));
+      $('#service-library').innerHTML=matches.map(item=>{const known=Object.values(subscriptions).find(s=>s.name===item.name);return '<button class="library-item" data-add-service="'+escapeHtml(item.name)+'"><span class="library-logo">'+(known?iconHtml(known):brandIcons[item.name]?iconHtml({icon:brandIcons[item.name]}):escapeHtml(item.name.slice(0,2)))+'</span><span>'+escapeHtml(item.name)+'</span></button>';}).join('')||'<p class="library-empty">没有找到服务，可手动创建订阅</p>';
+      $('.library-title').textContent=libraryCategory==='全部'?'全部服务':libraryCategory+'服务';
+    }
+    function openAdd(name) {
+      const known=Object.values(subscriptions).find(item=>item.name===name), template=library.find(item=>item.name===name);
+      addDraft={currency:known?.currency||(name==='Telegram Premium'?'USD':'CNY'),category:known?.category||template?.category||'其他',months:known?.months||1,manual:!!known?.manual,color:known?.color||(name==='Telegram Premium'?'#2AABEE':'#D97757'),icon:known?.icon||brandIcons[name],logo:known?.logo||(name==='Telegram Premium'?'➤':name.slice(0,1))};
+      $('#add-name').value=name==='自定义订阅'?'':name;$('#add-price').value=known?.amount??(name==='Telegram Premium'?4.99:0);
+      $('#add-currency').textContent=addDraft.currency+'⌄';$('#add-category').textContent=addDraft.category+'分类⌄';$('#add-cycle').textContent=(cycleNames[addDraft.months]||addDraft.months+'个月')+'⌄';
+      $('#add-logo').innerHTML=iconHtml({...addDraft,name});$('#add-note').value='';$('#add-error').textContent='';
+      $('#add-start').value='2026-09-01';$('#add-duration').value=addDraft.months;$('#add-trial-count').value='';$('#add-trial-price').value='';
+      $('#add-notify').classList.remove('on');$('#add-notify').setAttribute('aria-pressed','false');
+      renderAddMode(); renderAddColor();showView('add-form');
+    }
+    function renderAddMode() {
+      $$('.add-renew button').forEach(b=>b.classList.toggle('selected',(b.dataset.renewMode==='manual')===addDraft.manual));
+      $('#add-cycle-row').hidden=addDraft.manual;$('#add-trial-row').hidden=addDraft.manual;$('#add-duration-row').hidden=!addDraft.manual;
+    }
+    function renderAddColor() {
+      $('#add-color span').textContent=addDraft.color;$('#add-color .color-dot').style.background=addDraft.color;
+      $('.service-editor').style.background=addDraft.color+'20';
+    }
+    function saveAdd(continuing) {
+      const name=$('#add-name').value.trim(), price=$('#add-price').value, start=$('#add-start').value, duration=Number($('#add-duration').value);
+      if(!name||!amountInput(price)||!validDate(start)||start<'1900-01-01'||start>'2100-12-31'||(addDraft.manual&&(!Number.isInteger(duration)||duration<1||duration>1200))) {
+        $('#add-error').textContent='请填写名称、有效金额、日期和购买时长。';return;
+      }
+      if($('#add-trial-count').value && (!Number.isInteger(Number($('#add-trial-count').value))||Number($('#add-trial-count').value)<0||!amountInput($('#add-trial-price').value))) {
+        $('#add-error').textContent='请填写有效的优惠时长和优惠价格。';return;
+      }
+      const id='custom-'+Date.now(), months=addDraft.manual?duration:addDraft.months;
+      // ponytail: preview-only currency conversion uses the recorded rates; production needs dated exchange-rate records.
+      const converted=Number(price)*(rates[addDraft.currency]??0);
+      const next=addMonths(start,months);
+      subscriptions[id]={...addDraft,id,name,amount:Number(price),price:currencySymbol(addDraft.currency)+price+' '+addDraft.currency,cycle:addDraft.manual?'手动续费':(cycleNames[months]||months+'个月')+' · 自动扣费',months,start:fmtDate(start),next:fmtDate(next),nextLabel:(addDraft.manual?'到期日':'下次扣费日')+' · '+fmtDate(next),monthly:'¥'+(converted/months).toFixed(2),total:'¥'+converted.toFixed(2),yearly:'¥'+converted.toFixed(2),note:currencySymbol(addDraft.currency)+price+' · '+months+'个月',notify:$('#add-notify').classList.contains('on'),memo:$('#add-note').value};
+      if(!rates[addDraft.currency]) Object.assign(subscriptions[id],{monthly:'待换算',total:'待换算',yearly:'待换算'});
+      showView(continuing?'add-library':'home');showToast('已添加到本次预览，刷新后还原',true);
+    }
+    function renderAlternatives() {
+      const keys=['wps','xsus','bilibili','apple','anti','tencent','chatgpt'];
+      $('.alt-filters').innerHTML=keys.filter(key=>subscriptions[key]).map(key=>'<button class="chip '+(altId===key?'selected':'')+'" data-alt="'+key+'">'+escapeHtml(subscriptions[key].name)+'</button>').join('');
+      $('.alt-title').textContent='「'+(subscriptions[altId]?.name||'订阅')+'」的替代方案';
+      const rows=altData[altId];
+      $('.alt-list').innerHTML=rows?rows.map((row,index)=>'<button class="alt-card" data-alt-detail="'+index+'"><span class="alt-logo">'+(brandIcons[row[0]]?iconHtml({icon:brandIcons[row[0]]}):escapeHtml(row[0].slice(0,2)))+'</span><span><span class="alt-card-head"><span class="alt-name">'+escapeHtml(row[0])+'</span><span class="alt-price">'+escapeHtml(row[1])+'</span></span><span class="alt-desc">'+escapeHtml(row[2])+'</span><span class="alt-tags">'+row[3].split('|').map(tag=>'<span>'+tag+'</span>').join('')+'</span>'+(row[4]?'<span class="save-pill '+(row[4].startsWith('贵')?'costlier':'')+'">'+row[4]+'</span>':'')+'</span></button>').join(''):'<p class="library-empty">这项订阅的平替列表未在录屏中展开</p>';
+    }
+    function chartSvg(values,annual=false) {
+      const max=Math.max(100,...values), ceiling=Math.ceil(max/(max>500?200:50))*(max>500?200:50);
+      const x=i=>annual?110+i*140:38+i*25.2, y=value=>184-value/ceiling*148;
+      let svg='<svg class="plot" viewBox="0 0 338 214" role="img" aria-label="'+(annual?'年度支出趋势':'月度支出折线图')+'">';
+      for(let i=0;i<=4;i++){const value=ceiling*i/4,py=y(value);svg+='<line class="grid-line" x1="34" x2="330" y1="'+py+'" y2="'+py+'"/><text x="29" y="'+(py+3)+'" text-anchor="end">¥'+Math.round(value)+'</text>';}
+      if(!annual) svg+='<polyline fill="none" stroke="#7760f5" stroke-width="2.4" points="'+values.map((v,i)=>x(i)+','+y(v)).join(' ')+'"/>';
+      values.forEach((v,i)=>{
+        svg+='<g '+(!annual?'role="button" tabindex="0" data-chart-month="'+(i+1)+'" aria-label="'+(i+1)+'月支出 '+v.toFixed(2)+'元"':'')+'><title>'+v.toFixed(2)+'元</title>';
+        if(annual) svg+='<rect x="'+(x(i)-24)+'" y="'+y(v)+'" width="48" height="'+(184-y(v))+'" rx="3" fill="#6957de"/><text x="'+x(i)+'" y="'+(y(v)-9)+'" text-anchor="middle">¥'+Math.round(v)+'</text>';
+        else svg+='<rect x="'+(x(i)-10)+'" y="30" width="20" height="158" fill="transparent"/><line x1="'+x(i)+'" x2="'+x(i)+'" y1="184" y2="'+y(v)+'" stroke="#53535d" stroke-width="8" opacity=".55"/><circle cx="'+x(i)+'" cy="'+y(v)+'" r="3" fill="#7760f5"/>';
+        svg+='<text x="'+x(i)+'" y="204" text-anchor="middle">'+(annual?2025+i:(i+1)+'月')+'</text></g>';
+      });
+      return svg+'</svg>';
+    }
+    function renderStatistics() {
+      const rows=rowsFor(selectedYear,statCategory), summaries=summarize(selectedYear,statCategory);
+      const total=summaries.reduce((sum,row)=>sum+row.amount,0), paid=rows.reduce((sum,row)=>sum+row.paid,0);
+      $('.stat-categories').innerHTML=['全部','AI','影音','云服务','其他'].map(category=>'<button class="chip '+(category===statCategory?'selected':'')+'" data-stat-category="'+category+'">'+category+(category==='全部'?'':'('+ (category==='影音'&&selectedYear===2026?3:rowsFor(selectedYear,category).length)+')')+'</button>').join('');
+      $('#trend-view .summary-grid').innerHTML=(selectedYear===2026?[['本年已支出',money(paid),'按今年实际账单'],['全年预计',money(total),'含未来月份预测'],['月均成本','¥'+(statCategory==='全部'?102.05:statCategory==='AI'?61.47:rows.reduce((s,r)=>s+r.monthly,0)).toFixed(2),'当前生效订阅']]:[['2025年 年度支出',money(total),'按全年实际支出'],['较上年','—','上年无支出记录']]).map(([label,value,help])=>'<div class="summary-card"><span>'+label+'</span><strong>'+value+'</strong><small>'+help+'</small></div>').join('');
+      const monthly=Array.from({length:12},(_,i)=>rows.reduce((sum,row)=>sum+row.values[i],0)/100);
+      const annual=[2025,2026].map(year=>summarize(year,statCategory).reduce((sum,row)=>sum+row.amount,0)/100);
+      const charts=$$('#trend-view .chart-card');
+      charts[0].innerHTML='<div class="chart-head"><strong>年度支出趋势</strong><span>¥ · '+(statCategory==='全部'?'所有分类':statCategory)+'</span></div><p class="chart-help">按实际扣费/付款日期统计，未来月份为预测</p>'+chartSvg(annual,true);
+      charts[1].innerHTML='<div class="chart-head"><strong>'+selectedYear+'年 月度支出</strong><span>¥ · '+(statCategory==='全部'?'所有分类':statCategory)+'</span></div><p class="chart-help">按实际扣费/付款日期统计，未来月份为预测 · 点按图表看单月明细</p>'+chartSvg(monthly);
+      let top=$('#top-subscriptions');
+      if(!top){top=document.createElement('section');top.id='top-subscriptions';top.className='chart-card';$('#trend-view').append(top);}
+      top.innerHTML='<div class="chart-head"><strong>'+selectedYear+'年 Top 订阅</strong></div>'+summaries.sort((a,b)=>b.amount-a.amount).map(row=>'<div class="top-row"><span>'+escapeHtml(row.name)+'</span><strong>'+money(row.amount)+' <small>'+ (row.amount/total*100).toFixed(1)+'%</small></strong><div class="top-track"><i style="width:'+(row.amount/total*100)+'%;background:'+categoryColors[row.category]+'"></i></div></div>').join('');
+      if(!total) top.innerHTML+='<p class="plot-summary">暂无消费</p>';
+      renderRatio();
+    }
+    function ratioParts(month=null) {
+      const rows=summarize(selectedYear,'全部',month),total=rows.reduce((s,r)=>s+r.amount,0);
+      const grouped=Object.keys(categoryColors).map(category=>({category,amount:rows.filter(r=>r.category===category).reduce((s,r)=>s+r.amount,0),count:rows.filter(r=>r.category===category).length})).filter(r=>r.amount).sort((a,b)=>b.amount-a.amount);
+      let offset=0;
+      const gradient=grouped.map(row=>{const from=offset;offset+=row.amount/total*100;return categoryColors[row.category]+' '+from+'% '+offset+'%';}).join(',');
+      const legend=grouped.map(row=>'<div class="legend-row" style="--legend:'+categoryColors[row.category]+'"><i></i><span>'+row.category+'</span><span>'+row.count+'项</span><span>'+(row.amount/total*100).toFixed(1)+'%</span><strong>'+money(row.amount)+'</strong></div>').join('');
+      return {total,gradient,legend,description:grouped.map(row=>row.category+' '+(row.amount/total*100).toFixed(1)+'%').join('，')};
+    }
+    function renderRatio() {
+      const cards=$$('#ratio-view .ratio-card'),annual=ratioParts(),monthly=ratioParts(ratioMonth);
+      cards[0].querySelector('h2').textContent=selectedYear+'年 分类占比';cards[0].querySelector('.ratio-head span').textContent='年度总计 '+money(annual.total);
+      cards[1].querySelector('.month-summary').textContent=ratioMonth+'月总计 '+money(monthly.total);
+      [annual,monthly].forEach((data,i)=>{const donut=cards[i].querySelector('.donut');donut.style.background=data.total?'conic-gradient('+data.gradient+')':'';donut.classList.toggle('empty',!data.total);donut.setAttribute('aria-label',data.description||'暂无消费');cards[i].querySelector('.ratio-legend').innerHTML=data.legend;});
+      $$('.month-tabs button').forEach((button,index)=>{button.dataset.ratioMonth=index+1;button.classList.toggle('selected',index+1===ratioMonth);button.setAttribute('aria-pressed',index+1===ratioMonth);});
+    }
+    function renderIcons() {
+      const query=$('#icon-search').value.toLowerCase();
+      const group=$('.icon-categories .selected')?.textContent||'品牌标识';
+      const brands=Object.values(subscriptions).filter(item=>item.icon);
+      const generic=[['calendar 日历','M4 6h16v15H4z M8 3v6 M16 3v6 M4 11h16'],['wallet 钱包','M3 6h18v15H3z M3 6l14-3v3 M15 12h6v5h-6z'],['camera 相机','M3 7h5l2-3h4l2 3h5v14H3z M16 14a4 4 0 1 1-8 0 4 4 0 0 1 8 0'],['cloud 天气','M6 18a5 5 0 1 1 2-9 6 6 0 0 1 11 2 4 4 0 0 1-1 7z'],['bag 购物','M5 8h14l2 13H3z M8 9V6a4 4 0 0 1 8 0v3'],['heart 喜爱','M12 21 3 12C-2 4 8 0 12 7c4-7 14-3 9 5z']];
+      const useBrands=activeIconTab==='brands'||group==='品牌标识';
+      $('#icon-grid').innerHTML=useBrands?brands.filter(item=>item.name.toLowerCase().includes(query)).map(item=>'<button data-icon="'+item.icon+'" aria-label="'+escapeHtml(item.name)+'">'+iconHtml(item)+'</button>').join(''):generic.filter(([name])=>name.includes(query)).map(([name,path])=>'<button data-generic-icon="'+name.split(' ')[0]+'" aria-label="'+name+'"><svg class="icon" viewBox="0 0 24 24"><path d="'+path+'"/></svg></button>').join('');
+      if(query && !$('#icon-grid').children.length && activeIconTab==='icons') $('#icon-grid').innerHTML=generic.filter(([name])=>name.includes(query)).map(([name,path])=>'<button data-generic-icon="'+name.split(' ')[0]+'" aria-label="'+name+'"><svg class="icon" viewBox="0 0 24 24"><path d="'+path+'"/></svg></button>').join('');
+    }
+    function confirmUpdate() {
+      if(!amountInput($('#new-price').value)){$('#update-error').textContent='请输入有效的新价格。';return;}
+      const item=activeItem(),date=updateDraft.mode==='now'?$('#upgrade-date').value:cycleDate(updateDraft.month,item.start.replaceAll('.','-'));
+      if(!validDate(date)||date<item.start.replaceAll('.','-')){$('#update-error').textContent='生效日期不能早于订阅开始日期。';return;}
+      if(updateDraft.mode==='now'&&(!amountInput($('#upgrade-difference').value))){$('#update-error').textContent='请输入有效的补差价金额。';return;}
+      if(updateDraft.mode==='now' && (date===item.start.replaceAll('.','-')||date===item.next.replaceAll('.','-'))){$('#update-error').textContent='该日期是扣费日，请用「下个账期起」记录';showToast($('#update-error').textContent);return;}
+      const price=Number($('#new-price').value),note=item.price+' → '+currencySymbol(updateDraft.currency)+price+' '+updateDraft.currency+' · '+cycleNames[updateDraft.months];
+      item.future=(item.future||[]).filter(event=>!(event[0]===fmtDate(date)&&event[1]==='订阅更新'));
+      item.future.push([fmtDate(date),updateDraft.mode==='now'?'套餐升级':'订阅更新',note,'future']);item.future.sort((a,b)=>a[0].localeCompare(b[0]));
+      if(updateDraft.mode==='now'){item.amount=price;item.currency=updateDraft.currency;item.price=currencySymbol(item.currency)+price+' '+item.currency;if(updateDraft.anchor==='reset') item.next=fmtDate(addMonths(date,updateDraft.months));}
+      renderDetail();closeOverlays(true);showToast('订阅信息已更新（本次预览）',true);
+    }
+    function confirmRenew() {
+      const duration=Number($('#renew-duration').value),paid=$('#renew-date').value;
+      if(!amountInput($('#renew-price').value)||!Number.isInteger(duration)||duration<1||duration>1200||!validDate(paid)||paid<activeItem().start.replaceAll('.','-')){$('#renew-error').textContent='请填写有效的金额、续费时长和日期；续费日期不能早于开始日期。';return;}
+      const item=activeItem(),base=[item.next.replaceAll('.','-'),paid].sort().at(-1),unit=$('#renew-unit').value;
+      const expiry=unit==='day'?dateString(new Date(new Date(base+'T00:00:00Z').getTime()+duration*86400000)):addMonths(base,duration*(unit==='year'?12:1));
+      item.future=(item.future||[]).concat([[fmtDate(paid),'手动续费',currencySymbol(renewCurrency)+$('#renew-price').value+' · '+duration+({day:'天',month:'月',year:'年'}[unit]),'future']]);
+      item.next=fmtDate(expiry);item.nextLabel='到期日 · '+item.next;renderDetail();closeOverlays(true);showToast('已添加续费记录（本次预览）',true);
+    }
+
+    document.addEventListener('click',event=>{
+      const button=event.target.closest('button,[data-chart-month]');if(!button)return;
+      if(button.dataset.jump)showView(button.dataset.jump);
+      if(button.dataset.subscription)openSubscription(button.dataset.subscription);
+      if(button.dataset.sheet)openOverlay(button.dataset.sheet);
+      if(button.hasAttribute('data-close'))closeOverlays();
+      if(button.dataset.picker)openPicker(button.dataset.picker);
+      if(button.dataset.pick){picker.value=button.dataset.pick;selectButtons(button.parentElement,button);}
+      if(button.id==='picker-confirm'){picker.apply(picker.value);closeOverlays();}
+      if(button.id==='overview-toggle'){overviewMode=(overviewMode+1)%3;renderHome();}
+      if(button.dataset.addService)openAdd(button.dataset.addService);
+      if(button.dataset.saveAdd)saveAdd(button.dataset.saveAdd==='continue');
+      if(button.dataset.renewMode){addDraft.manual=button.dataset.renewMode==='manual';renderAddMode();}
+      if(button.dataset.mode){updateDraft.mode=button.dataset.mode;renderUpdate();}
+      if(button.dataset.anchor){updateDraft.anchor=button.dataset.anchor;renderUpdate();}
+      if(button.id==='confirm-update')confirmUpdate();
+      if(button.id==='confirm-renew')confirmRenew();
+      if(button.id==='confirm-stop'){
+        const expiry=monthEnd($('#stop-month').dataset.value),lastUpdate=(activeItem().future||[]).filter(e=>e[1]==='订阅更新').map(e=>e[0].replaceAll('.','-')).sort().at(-1);
+        if(lastUpdate&&expiry<lastUpdate){$('#stop-error').textContent='停止日期不能早于最近的变更/续费记录（'+fmtDate(lastUpdate)+'）';return;}
+        activeItem().stopped=expiry;renderDetail();closeOverlays(true);showToast('已停止订阅',true);
+      }
+      if(button.id==='cancel-stop'){delete activeItem().stopped;renderDetail();showToast('已取消停止',true);}
+      if(button.id==='confirm-delete'){delete subscriptions[currentId];currentId=Object.keys(subscriptions)[0];showView('home');showToast('已从本次预览删除，刷新可恢复',true);}
+      if(button.dataset.layout){compact=button.dataset.layout==='compact';selectButtons(button.parentElement,button);renderHome();}
+      if(button.classList.contains('switch')){
+        button.classList.toggle('on');button.setAttribute('aria-pressed',button.classList.contains('on'));
+        if(button.closest('#detail'))activeItem().notify=button.classList.contains('on');
+        if(button.dataset.setting)showToast('录屏样例暂无已过期订阅');
+        if(button.getAttribute('aria-label')==='订阅到期通知')showToast('原型仅切换开关，未调用系统通知');
+      }
+      if(button.closest('.add-categories')){libraryCategory=button.textContent;selectButtons(button.parentElement,button);renderLibrary();}
+      if(button.dataset.year){selectedYear=Number(button.dataset.year);selectButtons(button.parentElement,button);renderStatistics();}
+      if(button.dataset.statCategory){statCategory=button.dataset.statCategory;renderStatistics();}
+      if(button.dataset.statView){selectButtons(button.parentElement,button);$('#trend-view').hidden=button.dataset.statView!=='trend';$('#ratio-view').hidden=button.dataset.statView!=='ratio';$('#statistics .scroll').scrollTo({top:0});}
+      if(button.dataset.ratioMonth){ratioMonth=Number(button.dataset.ratioMonth);renderRatio();}
+      if(button.dataset.chartMonth){
+        const month=Number(button.dataset.chartMonth),rows=summarize(selectedYear,statCategory,month);
+        notice(selectedYear+'年'+month+'月支出',rows.length?rows.map(row=>row.name+' '+money(row.amount)).join('；'):'暂无消费');
+      }
+      if(button.dataset.alt){altId=button.dataset.alt;renderAlternatives();}
+      if(button.hasAttribute('data-alt-detail')){const row=altData[altId][Number(button.dataset.altDetail)];notice(row[0],row[2]+'。'+row[1]+'（录屏价格，仅用于 UI 还原）。录屏未展开详情页。');}
+      if(button.closest('.saving-card'))button.closest('.saving-card').remove();
+      if(button.dataset.colorTarget){
+        colorTarget=button.dataset.colorTarget;const color=colorTarget==='detail'?activeItem().color:addDraft.color;
+        $('#custom-color').value=color;
+        $('#color-grid').innerHTML=['#D97757','#D4252B','#10A37F','#2AABEE','#695DFF','#FF696C','#FFAE35','#AD3490','#17162F','#999999','#3479DC','#50A789'].map(c=>'<button data-color="'+c+'" style="background:'+c+'" class="'+(c===color?'selected':'')+'" aria-label="'+c+'"></button>').join('');openOverlay('color');
+      }
+      if(button.dataset.color){$('#custom-color').value=button.dataset.color;selectButtons(button.parentElement,button);}
+      if(button.id==='confirm-color'){const color=$('#custom-color').value.toUpperCase();if(colorTarget==='detail'){activeItem().color=color;renderDetail();}else{addDraft.color=color;renderAddColor();}closeOverlays();}
+      if(button.dataset.iconTarget){iconTarget=button.dataset.iconTarget;$('#icon-search').value='';renderIcons();openOverlay('icons');}
+      if(button.dataset.iconTab){activeIconTab=button.dataset.iconTab;selectButtons(button.parentElement,button);renderIcons();}
+      if(button.closest('.icon-categories')){activeIconTab='icons';selectButtons(button.parentElement,button);renderIcons();}
+      if(button.dataset.icon||button.dataset.genericIcon){
+        const target=iconTarget==='detail'?activeItem():addDraft;
+        target.icon=button.dataset.icon||null;target.iconSvg=button.dataset.genericIcon?button.querySelector('svg').outerHTML:null;
+        if(iconTarget==='detail')renderDetail();else $('#add-logo').innerHTML=iconHtml({...target,name:$('#add-name').value});closeOverlays();
+      }
+      if(button.id==='and-btn-fetch-rates') {
+        button.textContent = '拉取中...';
+        setTimeout(() => {
+          $('#and-rate-usd').value = '6.7829';
+          $('#and-rate-jpy').value = '0.0422';
+          $('#and-rate-eur').value = '7.8267';
+          $('#and-rate-gbp').value = '9.1278';
+          $('#and-rate-sync-status').textContent = '已联网同步官方中间价';
+          button.textContent = '⚡ 联网拉取';
+          showToast('已联网获取最新外汇中间价');
+        }, 400);
+      }
+      if(button.id==='and-btn-reset-rates') {
+        $('#and-rate-usd').value = '6.7829';
+        $('#and-rate-jpy').value = '0.0422';
+        $('#and-rate-eur').value = '7.8267';
+        $('#and-rate-gbp').value = '9.1278';
+        showToast('已恢复默认参考汇率');
+      }
+      if(button.id==='and-save-rates') {
+        const u = parseFloat($('#and-rate-usd').value), j = parseFloat($('#and-rate-jpy').value);
+        if(isNaN(u) || u <= 0 || isNaN(j) || j <= 0) { showToast('请输入合法汇率数值'); return; }
+        rates.USD = u; rates.JPY = j;
+        if(subscriptions.chatgpt) {
+          subscriptions.chatgpt.monthly = '¥' + (1430 * rates.JPY).toFixed(2);
+          subscriptions.chatgpt.total = '¥' + (2860 * rates.JPY).toFixed(2);
+          subscriptions.chatgpt.yearly = '¥' + (2860 * rates.JPY + 4 * 1430 * rates.JPY).toFixed(2);
+        }
+        if(subscriptions.claude) subscriptions.claude.monthly = '¥' + (20 * rates.USD).toFixed(2);
+        closeOverlays();
+        renderHome();
+        showToast('汇率已更新，外币订阅月均成本已重算');
+      }
+      if(button.id==='save-nickname'){const name=$('#nickname').value.trim();if(name){$('.profile-name').textContent=name;closeOverlays();}}
+      if(button.id==='export-submit'){const email=$('#email');if(!email.value||!email.checkValidity()){email.reportValidity();return;}notice('导出订阅列表','邮箱格式已校验；原型未连接邮件服务，没有发送邮件。');}
+    });
+    document.addEventListener('keydown',event=>{
+      if(event.key==='Escape'){closeOverlays();return;}
+      if((event.key==='Enter'||event.key===' ')&&event.target.hasAttribute('data-chart-month')){event.preventDefault();event.target.dispatchEvent(new MouseEvent('click',{bubbles:true}));}
+      if(event.key==='Tab'&&overlayStack.length){
+        const focusables=[...$('#'+overlayStack.at(-1)).querySelectorAll('button:not(:disabled),input,select,textarea,[tabindex="0"]')].filter(el=>el.getClientRects().length);
+        const first=focusables[0],last=focusables.at(-1);
+        if(event.shiftKey&&document.activeElement===first){event.preventDefault();last?.focus();}
+        if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first?.focus();}
+      }
+    });
+    $$('.overlay').forEach(overlay=>overlay.addEventListener('click',event=>{if(event.target===overlay)closeOverlays();}));
+    $('#service-search').addEventListener('input',renderLibrary);
+    $('#icon-search').addEventListener('input',renderIcons);
+    $('#upgrade-date').addEventListener('change',()=>{if(validDate($('#upgrade-date').value))renderUpdate();});
+    $('.add-categories').innerHTML=['全部',...categories].map(c=>'<button class="chip '+(c==='全部'?'selected':'')+'">'+c+'</button>').join('');
+    const footer=document.createElement('p');footer.className='settings-footer';footer.textContent='当前汇率 1美元 ≈ 6.7829人民币 · 100日元 ≈ 4.22人民币 2026-09-02 更新 · 当前版本 1.2.0';$('#settings .scroll').append(footer);
+    $$('svg').forEach(svg=>{if(!svg.hasAttribute('role'))svg.setAttribute('aria-hidden','true');});
+    renderHome();renderLibrary();renderStatistics();renderAlternatives();
+  </script>
+</body>
+</html>

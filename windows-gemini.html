@@ -1,0 +1,4464 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>订小阅 · Windows 桌面版 (Gemini Preview)</title>
+  <style>
+    :root {
+      --bg-app: #0f131c;
+      --bg-sidebar: #151a26;
+      --bg-master: #131824;
+      --bg-surface: #1b2232;
+      --bg-surface-elevated: #232b3e;
+      --bg-card: rgba(255, 255, 255, 0.05);
+      --bg-card-hover: rgba(255, 255, 255, 0.08);
+      --bg-chip: rgba(255, 255, 255, 0.06);
+      --bg-chip-hover: rgba(255, 255, 255, 0.12);
+      --bg-input: #121622;
+      
+      --text-main: #f3f5fa;
+      --text-muted: #959eb3;
+      --text-faint: #60687d;
+      
+      --brand-primary: #6957de;
+      --brand-primary-hover: #7b69ed;
+      --brand-accent: #d97757;
+      --brand-cyan: #3db8d5;
+      --brand-green: #3ec487;
+      --brand-danger: #f25247;
+      --brand-warning: #f5a623;
+      
+      --line: rgba(255, 255, 255, 0.08);
+      --line-subtle: rgba(255, 255, 255, 0.04);
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.25);
+      --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35);
+      --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.5);
+      
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --radius-xl: 18px;
+      
+      --font-stack: "Segoe UI", "PingFang SC", "Microsoft YaHei UI", -apple-system, system-ui, sans-serif;
+      --font-mono: "Cascadia Code", "Fira Code", Consolas, monospace;
+    }
+
+    body.theme-light {
+      --bg-app: #f4f6fb;
+      --bg-sidebar: #e9eef7;
+      --bg-master: #eef2f9;
+      --bg-surface: #ffffff;
+      --bg-surface-elevated: #f8fafc;
+      --bg-card: #ffffff;
+      --bg-card-hover: #fafcff;
+      --bg-chip: rgba(0, 0, 0, 0.06);
+      --bg-chip-hover: rgba(0, 0, 0, 0.1);
+      --bg-input: #ffffff;
+      
+      --text-main: #131722;
+      --text-muted: #4e586c;
+      --text-faint: #828e9f;
+      
+      --line: rgba(0, 0, 0, 0.09);
+      --line-subtle: rgba(0, 0, 0, 0.05);
+      --shadow-sm: 0 1px 4px rgba(20, 30, 50, 0.05);
+      --shadow-md: 0 6px 18px rgba(20, 30, 50, 0.07);
+      --shadow-lg: 0 16px 36px rgba(20, 30, 50, 0.12);
+    }
+
+    body.theme-light .master-item {
+      background: #ffffff;
+      border: 1px solid rgba(0, 0, 0, 0.07);
+      box-shadow: 0 2px 5px rgba(25, 35, 55, 0.04);
+    }
+    body.theme-light .master-item:hover {
+      background: #fafcff;
+      border-color: rgba(105, 87, 222, 0.35);
+      box-shadow: 0 4px 12px rgba(105, 87, 222, 0.08);
+    }
+    body.theme-light .master-item.active {
+      background: #f0edff;
+      border-color: var(--brand-primary);
+      box-shadow: 0 0 0 1px var(--brand-primary), 0 4px 12px rgba(105, 87, 222, 0.12);
+    }
+    body.theme-light .item-logo-box {
+      background: #ffffff;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+    body.theme-light .item-logo-box img {
+      mix-blend-mode: normal;
+    }
+    body.theme-light .detail-hero-box {
+      background: linear-gradient(135deg, rgba(217, 119, 87, 0.12) 0%, rgba(105, 87, 222, 0.07) 100%), #ffffff;
+    }
+    body.theme-light .detail-logo-btn {
+      background: #ffffff;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+    body.theme-light .detail-title-col h2 {
+      color: #131722;
+    }
+    body.theme-light .overview-hero-card {
+      background: linear-gradient(135deg, #203352 0%, #12223a 100%);
+      color: #fff;
+    }
+    body.theme-light .desktop-toast {
+      background: rgba(25, 33, 50, 0.95);
+      color: #fff;
+    }
+    body.theme-light .plot-chart .grid-line {
+      stroke: rgba(0, 0, 0, 0.08);
+    }
+    body.theme-light .plot-chart text {
+      fill: #4e586c;
+    }
+    body.theme-light .css-donut::after {
+      background: var(--bg-surface);
+    }
+    body.theme-light .app-tag {
+      background: rgba(105, 87, 222, 0.12);
+      color: #4b36c4;
+      font-weight: 600;
+    }
+    body.theme-light .nav-btn {
+      color: #4a5468;
+    }
+    body.theme-light .nav-btn:hover {
+      background: rgba(0, 0, 0, 0.04);
+      color: #131722;
+    }
+    body.theme-light .nav-btn.active {
+      background: #e4e0fb;
+      color: #4835c2;
+      font-weight: 650;
+    }
+    body.theme-light .nav-btn.active .icon {
+      stroke: #4835c2;
+    }
+    body.theme-light .nav-badge {
+      background: rgba(0, 0, 0, 0.06);
+      color: #4a5468;
+    }
+    body.theme-light .nav-btn.active .nav-badge {
+      background: #cfc6f9;
+      color: #4835c2;
+      font-weight: 700;
+    }
+    body.theme-light .service-card-tile {
+      background: #ffffff;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+    }
+    body.theme-light .service-card-tile:hover {
+      background: #fafcff;
+      border-color: var(--brand-primary);
+      box-shadow: 0 4px 12px rgba(105, 87, 222, 0.1);
+    }
+    body.theme-light .alt-product-card {
+      background: #ffffff;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+    }
+    body.theme-light .alt-product-card:hover {
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+    }
+    body.theme-light .user-profile-tile {
+      background: rgba(0, 0, 0, 0.03);
+    }
+    body.theme-light .user-profile-tile:hover {
+      background: rgba(0, 0, 0, 0.06);
+    }
+    body.theme-light .status-badge {
+      background: rgba(0, 0, 0, 0.04);
+    }
+    body.theme-light .global-search .search-shortcut {
+      background: rgba(0, 0, 0, 0.05);
+    }
+    body.theme-light .win-switch {
+      background: rgba(0, 0, 0, 0.15);
+    }
+    body.theme-light .win-switch.on {
+      background: var(--brand-primary);
+    }
+
+    /* ==========================================================================
+       Windows 11 Fluent 悬浮自适应细滚动条
+       ========================================================================== */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+    }
+    body.theme-light * {
+      scrollbar-color: rgba(0, 0, 0, 0.22) transparent;
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+      background: transparent;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.18);
+      border-radius: 999px;
+      transition: background 150ms ease;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.35);
+    }
+    body.theme-light ::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.2);
+    }
+    body.theme-light ::-webkit-scrollbar-thumb:hover {
+      background: rgba(0, 0, 0, 0.38);
+    }
+    [hidden] { display: none !important; }
+
+    /* 空状态与扩展桌面样式 */
+    .detail-empty-state {
+      max-width: 480px;
+      margin: 120px auto 0;
+      text-align: center;
+      padding: 40px 24px;
+      background: var(--bg-card);
+      border: 1px dashed var(--line);
+      border-radius: var(--radius-lg);
+    }
+    .status-item.clickable {
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+      transition: background 120ms ease, color 120ms ease;
+    }
+    .status-item.clickable:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-main);
+    }
+    body.theme-light .status-item.clickable:hover {
+      background: rgba(0, 0, 0, 0.06);
+    }
+    body.window-maximized {
+      border: none !important;
+    }
+    
+    body {
+      font-family: var(--font-stack);
+      background-color: var(--bg-app);
+      color: var(--text-main);
+      min-height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      user-select: none;
+      -webkit-user-select: none;
+      transition: background-color 160ms ease, color 160ms ease;
+    }
+
+    button, input, select, textarea {
+      font-family: inherit;
+      color: inherit;
+      font-size: 13px;
+    }
+    button {
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      outline: none;
+    }
+    button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+      outline: 2px solid var(--brand-primary);
+      outline-offset: 2px;
+    }
+
+    /* SVG 图标通用类 */
+    svg { display: block; }
+    .icon {
+      width: 18px;
+      height: 18px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      flex-shrink: 0;
+    }
+    .icon-sm { width: 15px; height: 15px; }
+    .icon-lg { width: 22px; height: 22px; }
+
+    /* ==========================================================================
+       Windows 标题栏 (Titlebar)
+       ========================================================================== */
+    .titlebar {
+      height: 40px;
+      background: var(--bg-sidebar);
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      flex-shrink: 0;
+      z-index: 100;
+    }
+    .titlebar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .app-brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 650;
+      font-size: 13px;
+      letter-spacing: 0.02em;
+    }
+    .app-logo-badge {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      background: linear-gradient(135deg, var(--brand-primary), var(--brand-accent));
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-weight: 800;
+      font-size: 12px;
+    }
+    .app-tag {
+      font-size: 10px;
+      padding: 1px 6px;
+      border-radius: 4px;
+      background: rgba(105, 87, 222, 0.2);
+      color: #b0a5f8;
+      font-family: var(--font-mono);
+    }
+    .titlebar-center {
+      flex: 1;
+      max-width: 480px;
+      margin: 0 20px;
+    }
+    .global-search {
+      position: relative;
+      width: 100%;
+    }
+    .global-search input {
+      width: 100%;
+      height: 28px;
+      background: var(--bg-input);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      padding: 0 65px 0 30px;
+      color: var(--text-main);
+      font-size: 12px;
+      transition: border-color 150ms, box-shadow 150ms;
+    }
+    .global-search input:focus {
+      border-color: var(--brand-primary);
+      box-shadow: 0 0 0 2px rgba(105, 87, 222, 0.25);
+    }
+    .global-search .search-icon {
+      position: absolute;
+      left: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+    .global-search .search-shortcut {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 10px;
+      color: var(--text-faint);
+      background: rgba(255, 255, 255, 0.06);
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-family: var(--font-mono);
+    }
+    .titlebar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--text-muted);
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--line-subtle);
+    }
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--brand-green);
+      box-shadow: 0 0 8px var(--brand-green);
+    }
+    .btn-quick-add {
+      background: var(--brand-primary);
+      color: #fff;
+      padding: 4px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 550;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 150ms, transform 120ms;
+    }
+    .btn-quick-add:hover { background: var(--brand-primary-hover); }
+    .btn-quick-add:active { transform: scale(0.97); }
+    
+    .window-controls {
+      display: flex;
+      align-items: center;
+      margin-left: 8px;
+    }
+    .win-btn {
+      width: 32px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      color: var(--text-muted);
+      border-radius: 4px;
+      transition: background 120ms, color 120ms;
+    }
+    .win-btn:hover { background: rgba(255, 255, 255, 0.08); color: var(--text-main); }
+    .win-btn.close:hover { background: #e81123; color: #fff; }
+
+    /* ==========================================================================
+       桌面主工作区容器与侧边栏 (Layout & NavigationRail)
+       ========================================================================== */
+    .app-body {
+      flex: 1;
+      display: flex;
+      min-height: 0;
+      overflow: hidden;
+      position: relative;
+    }
+    
+    .sidebar {
+      width: 220px;
+      background: var(--bg-sidebar);
+      border-right: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      transition: width 200ms cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 20;
+    }
+    .sidebar.collapsed {
+      width: 64px;
+    }
+    .sidebar-nav {
+      flex: 1;
+      padding: 12px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      overflow-y: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    .sidebar-nav::-webkit-scrollbar {
+      display: none;
+      width: 0;
+      height: 0;
+    }
+    .nav-btn {
+      width: 100%;
+      height: 40px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 12px;
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 140ms ease;
+      position: relative;
+      white-space: nowrap;
+    }
+    .nav-btn:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-main);
+    }
+    .nav-btn.active {
+      background: rgba(105, 87, 222, 0.16);
+      color: #c4baff;
+      font-weight: 600;
+    }
+    .nav-btn.active::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 8px;
+      bottom: 8px;
+      width: 3px;
+      border-radius: 0 3px 3px 0;
+      background: var(--brand-primary);
+    }
+    .nav-badge {
+      margin-left: auto;
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-muted);
+    }
+    .sidebar.collapsed .nav-btn span,
+    .sidebar.collapsed .nav-badge {
+      display: none;
+    }
+    .sidebar.collapsed .nav-btn {
+      justify-content: center;
+      padding: 0;
+    }
+
+    .sidebar-footer {
+      padding: 12px 8px;
+      border-top: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .user-profile-tile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.03);
+      cursor: pointer;
+      transition: background 150ms;
+    }
+    .user-profile-tile:hover {
+      background: rgba(255, 255, 255, 0.07);
+    }
+    .user-avatar-img {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: url('assets/recording/avatar.png') center/cover, #333;
+      flex-shrink: 0;
+    }
+    .user-meta {
+      flex: 1;
+      min-width: 0;
+      text-align: left;
+    }
+    .user-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-main);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .user-role {
+      font-size: 10px;
+      color: var(--brand-warning);
+    }
+    .sidebar.collapsed .user-meta { display: none; }
+    .sidebar.collapsed .user-profile-tile { justify-content: center; padding: 6px 0; }
+
+    .sidebar-toggle-btn {
+      height: 30px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      color: var(--text-faint);
+      font-size: 11px;
+    }
+    .sidebar-toggle-btn:hover { color: var(--text-main); background: rgba(255, 255, 255, 0.04); }
+
+    /* ==========================================================================
+       主工作区视图 (Main Content Panes)
+       ========================================================================== */
+    .main-viewport {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-app);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .view-pane {
+      position: absolute;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      overflow-y: auto;
+      background: var(--bg-app);
+    }
+    .view-pane.active {
+      display: flex;
+    }
+
+    /* 视图顶栏通用标题区 */
+    .view-header {
+      padding: 20px 24px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      border-bottom: 1px solid var(--line);
+      background: var(--bg-app);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .view-title-group h1 {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+    .view-title-group p {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+    .view-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* ==========================================================================
+       1. 订阅总览视图 (Master-Detail 双栏工作台)
+       ========================================================================== */
+    .master-detail-container {
+      flex: 1;
+      display: flex;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    /* 左侧 Master 列表栏 */
+    .master-pane {
+      width: 380px;
+      border-right: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-master);
+      flex-shrink: 0;
+    }
+    
+    .master-top-bar {
+      padding: 16px 16px 12px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    /* 概览大卡片 (复刻录屏与桌面增强) */
+    .overview-hero-card {
+      padding: 14px 16px;
+      border-radius: var(--radius-lg);
+      background: linear-gradient(135deg, #1e2e4a 0%, #152038 100%);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: var(--shadow-sm);
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 140ms ease, box-shadow 140ms ease;
+    }
+    .overview-hero-card:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+    .overview-hero-card::after {
+      content: "";
+      position: absolute;
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      right: -50px;
+      bottom: -60px;
+      background: radial-gradient(circle, rgba(105, 87, 222, 0.25) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .overview-row-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.7);
+    }
+    .overview-toggle-hint {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 6px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 4px;
+      font-size: 10px;
+      color: #9eb9f8;
+    }
+    .overview-val-row {
+      margin-top: 10px;
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+    .overview-val-row strong {
+      font-size: 26px;
+      font-weight: 750;
+      color: #fff;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.02em;
+    }
+    .overview-val-row span {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    /* 过滤与排序工具条 */
+    .master-filters {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .category-chip-row {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding-bottom: 2px;
+    }
+    .category-chip-row::-webkit-scrollbar { display: none; }
+    .filter-chip {
+      flex: 0 0 auto;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: var(--bg-chip);
+      border: 1px solid var(--line-subtle);
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 500;
+      transition: all 120ms;
+    }
+    .filter-chip:hover {
+      background: var(--bg-chip-hover);
+      color: var(--text-main);
+    }
+    .filter-chip.active {
+      background: var(--brand-primary);
+      border-color: var(--brand-primary);
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .master-list-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-muted);
+      padding: 0 2px;
+    }
+    .sort-select {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 500;
+      cursor: pointer;
+      padding-right: 4px;
+    }
+    .sort-select:focus { outline: none; }
+    .layout-toggle-btn {
+      color: var(--text-muted);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .layout-toggle-btn:hover { color: var(--text-main); background: var(--bg-chip); }
+
+    /* 订阅列表流 */
+    .master-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 12px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    .master-list::-webkit-scrollbar {
+      display: none;
+      width: 0;
+      height: 0;
+    }
+    .master-item {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: var(--radius-md);
+      background: var(--bg-card);
+      border: 1px solid var(--line-subtle);
+      display: grid;
+      grid-template-columns: 38px 1fr auto;
+      align-items: center;
+      gap: 12px;
+      text-align: left;
+      cursor: pointer;
+      transition: all 140ms ease;
+      position: relative;
+    }
+    .master-item:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--line);
+      transform: translateX(2px);
+    }
+    .master-item.active {
+      background: rgba(105, 87, 222, 0.15);
+      border-color: rgba(105, 87, 222, 0.4);
+      box-shadow: 0 0 0 1px rgba(105, 87, 222, 0.3);
+    }
+    .master-item.compact {
+      padding: 6px 10px;
+    }
+    
+    .item-logo-box {
+      width: 38px;
+      height: 38px;
+      border-radius: 9px;
+      background: rgba(255, 255, 255, 0.08);
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .master-item.compact .item-logo-box {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      font-size: 13px;
+    }
+    .item-logo-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    .item-main {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .item-title-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-main);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .tag-badge {
+      font-size: 9px;
+      font-weight: 600;
+      padding: 1px 5px;
+      border-radius: 4px;
+      background: var(--brand-accent);
+      color: #fff;
+    }
+    .tag-badge.manual {
+      background: var(--brand-cyan);
+    }
+    .tag-badge.stopped {
+      background: var(--brand-danger);
+    }
+    .item-meta-row {
+      font-size: 11px;
+      color: var(--text-muted);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .master-item.compact .item-meta-row { display: none; }
+    
+    .item-price-col {
+      text-align: right;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 2px;
+    }
+    .item-price-main {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-main);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+    .item-price-main small {
+      font-size: 9px;
+      font-weight: 400;
+      color: var(--text-muted);
+      margin-left: 2px;
+    }
+    .item-due-text {
+      font-size: 10px;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    /* 右侧 Detail 工作台栏 */
+    .detail-pane {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-app);
+      overflow-y: auto;
+      padding: 24px 32px 40px;
+    }
+
+    .detail-workspace {
+      max-width: 860px;
+      width: 100%;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* 详情顶部主要卡片 */
+    .detail-hero-box {
+      padding: 24px;
+      border-radius: var(--radius-xl);
+      background: linear-gradient(135deg, rgba(217, 119, 87, 0.15) 0%, rgba(105, 87, 222, 0.1) 100%), var(--bg-surface);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow-md);
+      display: grid;
+      grid-template-columns: 64px 1fr auto;
+      gap: 20px;
+      align-items: center;
+      position: relative;
+    }
+    .detail-logo-btn {
+      width: 64px;
+      height: 64px;
+      border-radius: var(--radius-lg);
+      background: var(--bg-surface-elevated);
+      display: grid;
+      place-items: center;
+      font-size: 28px;
+      font-weight: 800;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      transition: transform 120ms;
+    }
+    .detail-logo-btn:hover { transform: scale(1.05); }
+    .detail-logo-btn img { width: 100%; height: 100%; object-fit: contain; }
+
+    .detail-title-col h2 {
+      font-size: 22px;
+      font-weight: 750;
+      color: var(--text-main);
+    }
+    .detail-title-col .detail-subinfo {
+      margin-top: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 16px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .detail-subinfo b { color: var(--text-main); font-weight: 600; }
+
+    .detail-hero-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 10px;
+    }
+    .category-badge-btn {
+      padding: 6px 12px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-chip);
+      color: var(--text-main);
+      font-size: 12px;
+      font-weight: 500;
+      border: 1px solid var(--line);
+    }
+    .category-badge-btn:hover { background: var(--bg-chip-hover); }
+
+    /* 4 个指标大卡片 */
+    .metrics-quad-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+    .metric-card {
+      padding: 16px;
+      border-radius: var(--radius-lg);
+      background: var(--bg-surface);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .metric-card .metric-label {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    .metric-card .metric-value {
+      font-size: 20px;
+      font-weight: 750;
+      color: var(--text-main);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* 桌面属性面板（卡片底色、到期通知） */
+    .detail-props-card {
+      border-radius: var(--radius-lg);
+      background: var(--bg-surface);
+      border: 1px solid var(--line);
+      overflow: hidden;
+    }
+    .prop-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--line);
+      font-size: 13px;
+    }
+    .prop-row:last-child { border-bottom: none; }
+    
+    .color-picker-trigger {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 10px;
+      border-radius: var(--radius-sm);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--line);
+    }
+    .color-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--brand-accent);
+    }
+
+    /* Windows 风格开关 (Toggle Switch) */
+    .win-switch {
+      width: 44px;
+      height: 22px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.15);
+      position: relative;
+      cursor: pointer;
+      transition: background 150ms ease;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .win-switch::after {
+      content: "";
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      top: 2px;
+      left: 2px;
+      border-radius: 50%;
+      background: #fff;
+      transition: transform 150ms ease;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+    .win-switch.on {
+      background: var(--brand-primary);
+    }
+    .win-switch.on::after {
+      transform: translateX(22px);
+    }
+
+    /* 订阅全生命周期时间线 (Timeline) */
+    .timeline-section-card {
+      padding: 20px 24px;
+      border-radius: var(--radius-lg);
+      background: var(--bg-surface);
+      border: 1px solid var(--line);
+    }
+    .section-head-title {
+      font-size: 14px;
+      font-weight: 650;
+      color: var(--text-main);
+      margin-bottom: 16px;
+    }
+    .timeline-flow {
+      position: relative;
+      padding-left: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .timeline-flow::before {
+      content: "";
+      position: absolute;
+      left: 6px;
+      top: 6px;
+      bottom: 6px;
+      width: 2px;
+      background: var(--line);
+    }
+    .timeline-node {
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+    }
+    .timeline-point {
+      position: absolute;
+      left: -18px;
+      top: 3px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--brand-primary);
+      border: 2px solid var(--bg-surface);
+    }
+    .timeline-point.future { background: var(--brand-cyan); }
+    .timeline-point.hollow { background: transparent; border: 2px solid var(--text-muted); }
+    .timeline-point.danger { background: var(--brand-danger); }
+    
+    .timeline-body {
+      flex: 1;
+    }
+    .timeline-date-text {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+    .timeline-event-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-top: 2px;
+    }
+    .timeline-detail-note {
+      font-size: 12px;
+      color: var(--text-muted);
+      text-align: right;
+    }
+
+    /* 详情页底部操作栏 */
+    .detail-action-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-top: 8px;
+    }
+    .primary-action-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .btn-action-primary {
+      padding: 10px 24px;
+      border-radius: var(--radius-md);
+      background: var(--brand-primary);
+      color: #fff;
+      font-weight: 600;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 140ms;
+    }
+    .btn-action-primary:hover { background: var(--brand-primary-hover); transform: translateY(-1px); }
+    
+    .btn-action-secondary {
+      padding: 10px 20px;
+      border-radius: var(--radius-md);
+      background: var(--bg-surface);
+      color: var(--text-main);
+      font-weight: 550;
+      font-size: 13px;
+      border: 1px solid var(--line);
+      transition: all 140ms;
+    }
+    .btn-action-secondary:hover { background: var(--bg-chip-hover); }
+
+    .btn-action-danger-link {
+      color: var(--brand-danger);
+      font-size: 12px;
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+    }
+    .btn-action-danger-link:hover { background: rgba(242, 82, 71, 0.1); }
+
+    /* ==========================================================================
+       2. 统计看板视图 (Analytics Dashboard)
+       ========================================================================== */
+    .analytics-content {
+      padding: 24px 32px 48px;
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .analytics-filter-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .year-seg-group, .view-mode-seg {
+      display: flex;
+      padding: 3px;
+      border-radius: var(--radius-md);
+      background: var(--bg-surface);
+      border: 1px solid var(--line);
+    }
+    .seg-pill-btn {
+      padding: 6px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-muted);
+      transition: all 140ms;
+    }
+    .seg-pill-btn.active {
+      background: var(--brand-primary);
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .stat-kpi-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .kpi-card {
+      padding: 20px;
+      border-radius: var(--radius-lg);
+      background: var(--bg-surface);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow-sm);
+    }
+    .kpi-card span {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .kpi-card strong {
+      display: block;
+      margin-top: 8px;
+      font-size: 26px;
+      font-weight: 750;
+      color: var(--text-main);
+      font-variant-numeric: tabular-nums;
+    }
+    .kpi-card small {
+      display: block;
+      margin-top: 4px;
+      font-size: 11px;
+      color: var(--text-faint);
+    }
+
+    .charts-duo-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .chart-box-card {
+      padding: 24px;
+      border-radius: var(--radius-xl);
+      background: var(--bg-surface);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .chart-box-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .chart-box-head h3 {
+      font-size: 15px;
+      font-weight: 650;
+      color: var(--text-main);
+    }
+    .chart-box-head span {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* SVG 图表样式 */
+    .svg-plot-wrap {
+      width: 100%;
+    }
+    .plot-chart {
+      width: 100%;
+      height: auto;
+      overflow: visible;
+    }
+    .plot-chart text {
+      font-family: var(--font-stack);
+      font-size: 10px;
+      fill: var(--text-muted);
+    }
+    .plot-chart .grid-line {
+      stroke: var(--line);
+      stroke-width: 1;
+    }
+    .plot-chart [role=button] {
+      cursor: pointer;
+    }
+    .plot-chart [role=button]:hover circle {
+      r: 6;
+      fill: var(--brand-accent);
+    }
+
+    /* 环形图 (Donut) 与图例 */
+    .ratio-content-wrap {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 24px;
+      align-items: center;
+      margin-top: 12px;
+    }
+    .donut-visual-box {
+      position: relative;
+      width: 160px;
+      height: 160px;
+      margin: 0 auto;
+    }
+    .css-donut {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      position: relative;
+      background: conic-gradient(var(--brand-primary) 0 42.5%, var(--brand-accent) 42.5% 68.8%, var(--brand-cyan) 68.8% 86%, #888 86%);
+    }
+    .css-donut::after {
+      content: "";
+      position: absolute;
+      inset: 22%;
+      border-radius: 50%;
+      background: var(--bg-surface);
+    }
+    .css-donut.empty {
+      background: #333 !important;
+    }
+    .css-donut.empty::after {
+      content: "无数据";
+      display: grid;
+      place-items: center;
+      color: var(--text-faint);
+      font-size: 12px;
+    }
+    .ratio-legend-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .legend-data-row {
+      display: grid;
+      grid-template-columns: 10px 1fr 40px 50px 80px;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+    }
+    .legend-data-row i {
+      width: 8px;
+      height: 8px;
+      border-radius: 2px;
+    }
+    .legend-data-row strong {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Top 订阅排行榜 */
+    .top-rank-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .top-rank-row {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 12px;
+    }
+    .top-rank-meta {
+      display: flex;
+      justify-content: space-between;
+    }
+    .top-progress-bar {
+      height: 6px;
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.06);
+      overflow: hidden;
+    }
+    .top-progress-fill {
+      height: 100%;
+      border-radius: 3px;
+    }
+
+    /* ==========================================================================
+       3. 平替智选视图 (Alternative Matrix)
+       ========================================================================== */
+    .alternatives-content {
+      padding: 24px 32px 48px;
+      max-width: 1100px;
+      width: 100%;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    
+    .insights-tips-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .insight-card {
+      padding: 16px 20px;
+      border-radius: var(--radius-lg);
+      background: linear-gradient(135deg, rgba(62, 196, 135, 0.1) 0%, var(--bg-surface) 100%);
+      border: 1px solid rgba(62, 196, 135, 0.2);
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      position: relative;
+    }
+    .insight-card strong {
+      font-size: 13px;
+      color: var(--text-main);
+    }
+    .insight-card p {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      line-height: 1.5;
+    }
+    .insight-card em {
+      color: var(--brand-green);
+      font-style: normal;
+      font-weight: 600;
+    }
+
+    .alt-subs-selector {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+    .alt-sub-pill {
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: var(--bg-surface);
+      border: 1px solid var(--line);
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .alt-sub-pill.active {
+      background: var(--brand-primary);
+      border-color: var(--brand-primary);
+      color: #fff;
+    }
+
+    .alt-cards-matrix {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 16px;
+    }
+    .alt-product-card {
+      padding: 18px;
+      border-radius: var(--radius-lg);
+      background: var(--bg-surface);
+      border: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 12px;
+      transition: all 140ms;
+      cursor: pointer;
+    }
+    .alt-product-card:hover {
+      border-color: var(--line-subtle);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    .alt-top-row {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .alt-logo-box {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      background: var(--bg-surface-elevated);
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      color: var(--brand-primary);
+      font-size: 18px;
+      overflow: hidden;
+      flex-shrink: 0;
+      border: 1px solid var(--line);
+    }
+    .alt-logo-box img { width: 100%; height: 100%; object-fit: contain; }
+    .alt-info {
+      flex: 1;
+    }
+    .alt-info h4 {
+      font-size: 14px;
+      font-weight: 650;
+      color: var(--text-main);
+    }
+    .alt-info p {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      line-height: 1.45;
+    }
+    .alt-tag-flow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 8px;
+    }
+    .alt-tag-flow span {
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: var(--bg-chip);
+      color: var(--text-muted);
+    }
+    .alt-bottom-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--line);
+      padding-top: 10px;
+    }
+    .alt-pricing-text {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+    .alt-diff-badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: rgba(62, 196, 135, 0.15);
+      color: var(--brand-green);
+    }
+    .alt-diff-badge.costlier {
+      background: rgba(242, 82, 71, 0.15);
+      color: var(--brand-danger);
+    }
+
+    /* ==========================================================================
+       4. 服务发现与模板库视图 (Service Library)
+       ========================================================================== */
+    .library-content {
+      padding: 24px 32px 48px;
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .library-action-header {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+    .lib-search-input {
+      width: 320px;
+      height: 36px;
+      border-radius: var(--radius-md);
+      background: var(--bg-surface);
+      border: 1px solid var(--line);
+      padding: 0 14px;
+      color: var(--text-main);
+    }
+    .lib-search-input:focus { border-color: var(--brand-primary); }
+
+    .service-grid-matrix {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 12px;
+    }
+    .service-card-tile {
+      padding: 12px 14px;
+      border-radius: var(--radius-md);
+      background: var(--bg-surface);
+      border: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: all 130ms;
+      text-align: left;
+    }
+    .service-card-tile:hover {
+      background: var(--bg-surface-elevated);
+      border-color: var(--brand-primary);
+      transform: translateY(-2px);
+    }
+    .service-card-tile .tile-logo {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      background: var(--bg-surface-elevated);
+      display: grid;
+      place-items: center;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-main);
+      overflow: hidden;
+      flex-shrink: 0;
+      border: 1px solid var(--line);
+    }
+    .service-card-tile .tile-logo img { width: 100%; height: 100%; object-fit: contain; }
+    .service-card-tile .tile-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-main);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* ==========================================================================
+       5. 偏好与数据备份视图 (Settings & Backup)
+       ========================================================================== */
+    .settings-content {
+      padding: 24px 32px 48px;
+      max-width: 800px;
+      width: 100%;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    .settings-group-card {
+      border-radius: var(--radius-xl);
+      background: var(--bg-surface);
+      border: 1px solid var(--line);
+      overflow: hidden;
+    }
+    .settings-group-head {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--line);
+      font-size: 13px;
+      font-weight: 650;
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.02);
+    }
+    .setting-item-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--line);
+      font-size: 13px;
+    }
+    .setting-item-row:last-child { border-bottom: none; }
+    .setting-meta-info strong { display: block; color: var(--text-main); font-size: 13px; }
+    .setting-meta-info span { display: block; color: var(--text-muted); font-size: 11px; margin-top: 2px; }
+
+    .btn-file-backup {
+      padding: 8px 16px;
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-main);
+      font-weight: 550;
+      font-size: 12px;
+      border: 1px solid var(--line);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+    .btn-file-backup:hover { background: rgba(255, 255, 255, 0.14); }
+
+    /* ==========================================================================
+       桌面抽屉 (Slide-in Drawer) & 模态框 (Modals)
+       ========================================================================== */
+    .drawer-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 200;
+      display: none;
+      justify-content: flex-end;
+    }
+    .drawer-overlay.open { display: flex; }
+    .drawer-panel {
+      width: 460px;
+      max-width: 100vw;
+      height: 100%;
+      background: var(--bg-surface);
+      border-left: 1px solid var(--line);
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      flex-direction: column;
+      animation: drawer-in 200ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes drawer-in { from { transform: translateX(100%); } to { transform: translateX(0); } }
+
+    .drawer-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .drawer-header h3 { font-size: 16px; font-weight: 650; }
+    .drawer-close-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-sm);
+      display: grid;
+      place-items: center;
+      color: var(--text-muted);
+    }
+    .drawer-close-btn:hover { background: rgba(255, 255, 255, 0.1); color: var(--text-main); }
+    .drawer-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .drawer-footer {
+      padding: 16px 20px;
+      border-top: 1px solid var(--line);
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      background: var(--bg-surface-elevated);
+    }
+
+    /* 模态对话框 (Dialog Modal) */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 300;
+      display: none;
+      place-items: center;
+      padding: 20px;
+    }
+    .modal-overlay.open { display: grid; }
+    .modal-dialog {
+      width: 440px;
+      max-width: 100%;
+      border-radius: var(--radius-xl);
+      background: var(--bg-surface);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      animation: modal-in 160ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes modal-in { from { transform: scale(0.96); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+    .modal-header {
+      padding: 18px 20px 14px;
+      font-size: 16px;
+      font-weight: 650;
+      border-bottom: 1px solid var(--line);
+    }
+    .modal-content {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      font-size: 13px;
+    }
+    .modal-footer {
+      padding: 14px 20px;
+      border-top: 1px solid var(--line);
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    /* 表单控件 (Form Elements) */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .form-group label {
+      font-size: 12px;
+      font-weight: 550;
+      color: var(--text-muted);
+    }
+    .form-control {
+      width: 100%;
+      height: 36px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-input);
+      border: 1px solid var(--line);
+      padding: 0 12px;
+      color: var(--text-main);
+      font-size: 13px;
+    }
+    .form-control:focus {
+      border-color: var(--brand-primary);
+    }
+    .form-row-duo {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .form-error-msg {
+      font-size: 11px;
+      color: var(--brand-danger);
+      margin-top: 4px;
+    }
+
+    /* 桌面图标网格选择器 */
+    .icon-picker-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+      max-height: 240px;
+      overflow-y: auto;
+      padding: 4px;
+    }
+    .icon-tile-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.06);
+      display: grid;
+      place-items: center;
+      font-size: 18px;
+    }
+    .icon-tile-btn:hover { background: rgba(255, 255, 255, 0.14); }
+    .icon-tile-btn img { width: 28px; height: 28px; object-fit: contain; }
+
+    /* 调色板网格 */
+    .color-swatch-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 10px;
+    }
+    .color-swatch-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      transition: transform 120ms;
+    }
+    .color-swatch-btn:hover { transform: scale(1.1); }
+    .color-swatch-btn.selected { border-color: #fff; }
+
+    /* ==========================================================================
+       底部状态栏 (Desktop Status Bar)
+       ========================================================================== */
+    .statusbar {
+      height: 28px;
+      background: var(--bg-sidebar);
+      border-top: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      font-size: 11px;
+      color: var(--text-muted);
+      flex-shrink: 0;
+      z-index: 100;
+    }
+    .status-left, .status-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Toast 通知条 */
+    .desktop-toast {
+      position: fixed;
+      bottom: 40px;
+      right: 24px;
+      padding: 12px 18px;
+      border-radius: var(--radius-md);
+      background: rgba(35, 43, 62, 0.95);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow-lg);
+      color: #fff;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 1000;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 160ms, transform 160ms;
+      pointer-events: none;
+    }
+    .desktop-toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .toast-icon { color: var(--brand-green); }
+
+    /* 隐藏的真实文件输入 */
+    #hidden-file-input { display: none; }
+
+    @media (max-width: 960px) {
+      .sidebar { width: 64px; }
+      .sidebar .nav-btn span, .sidebar .nav-badge, .sidebar .user-meta { display: none; }
+      .sidebar .nav-btn { justify-content: center; padding: 0; }
+      .charts-duo-grid { grid-template-columns: 1fr; }
+      .metrics-quad-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 768px) {
+      .master-detail-container { flex-direction: column; overflow-y: auto; }
+      .master-pane { width: 100%; border-right: none; border-bottom: 1px solid var(--line); }
+      .detail-pane { padding: 16px; }
+      .titlebar-center { display: none; }
+      .stat-kpi-row { grid-template-columns: 1fr; }
+      .insights-tips-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation: none !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==================== Windows 标题栏 ==================== -->
+  <header class="titlebar" aria-label="窗口标题栏">
+    <div class="titlebar-left">
+      <div class="app-brand">
+        <div class="app-logo-badge">阅</div>
+        <span>订小阅</span>
+        <span class="app-tag">Windows v1.2</span>
+      </div>
+    </div>
+
+    <div class="titlebar-center">
+      <div class="global-search">
+        <svg class="icon icon-sm search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input id="global-search-input" type="search" placeholder="搜索订阅、服务、分类 (Ctrl+F)" aria-label="全局搜索">
+        <span class="search-shortcut">Ctrl+F</span>
+      </div>
+    </div>
+
+    <div class="titlebar-right">
+      <div class="status-badge" title="Drift / SQLite 本地优先数据库就绪">
+        <i class="status-dot"></i>
+        <span>本地就绪</span>
+      </div>
+      <button class="win-btn" id="btn-quick-theme" title="切换深色/浅色外观">
+        <svg class="icon icon-sm" id="theme-icon-sun" viewBox="0 0 24 24" hidden><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <svg class="icon icon-sm" id="theme-icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <button class="btn-quick-add" id="btn-quick-add" title="新建订阅 (Ctrl+N)">
+        <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+        <span>新建订阅</span>
+      </button>
+      <div class="window-controls">
+        <button class="win-btn" id="win-btn-min" title="最小化到托盘">─</button>
+        <button class="win-btn" id="win-btn-max" title="最大化/还原窗口">□</button>
+        <button class="win-btn close" id="win-btn-close" title="退出窗口">✕</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== 桌面主工作区容器 ==================== -->
+  <div class="app-body">
+    
+    <!-- 左侧导航栏 (Sidebar / NavigationRail) -->
+    <nav class="sidebar" id="sidebar" aria-label="应用主导航">
+      <div class="sidebar-nav">
+        <button class="nav-btn active" data-nav="overview" title="订阅总览 (Ctrl+1)">
+          <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+          <span>订阅总览</span>
+          <span class="nav-badge" id="nav-badge-count">8</span>
+        </button>
+        <button class="nav-btn" data-nav="analytics" title="统计看板 (Ctrl+2)">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+          <span>统计看板</span>
+        </button>
+        <button class="nav-btn" data-nav="alternatives" title="平替智选 (Ctrl+3)">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M9 18h6m-5 3h4m4-10a6 6 0 1 0-9.8 4.6c.6.5.8 1 .8 1.4h6c0-.5.2-1 .8-1.4A6 6 0 0 0 18 11Z"/></svg>
+          <span>平替智选</span>
+        </button>
+        <button class="nav-btn" data-nav="library" title="服务发现 (Ctrl+4)">
+          <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+          <span>服务发现</span>
+        </button>
+        <button class="nav-btn" data-nav="settings" title="偏好与备份 (Ctrl+5)">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+          <span>偏好与备份</span>
+        </button>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="user-profile-tile" id="sidebar-user-tile" title="设置昵称与 Pro 状态">
+          <div class="user-avatar-img"></div>
+          <div class="user-meta">
+            <div class="user-name" id="user-display-name">订小阅用户</div>
+            <div class="user-role">★ 免费版 (可升级)</div>
+          </div>
+        </div>
+        <button class="sidebar-toggle-btn" id="btn-toggle-sidebar" title="收起/展开侧栏">
+          <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+          <span>收起导航</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- 主工作区 -->
+    <main class="main-viewport">
+      
+      <!-- ==================== 1. 订阅总览 (Master-Detail 双栏) ==================== -->
+      <section class="view-pane active" id="view-overview" aria-label="订阅总览">
+        <div class="master-detail-container">
+          
+          <!-- 左侧 Master 列表栏 -->
+          <div class="master-pane">
+            <div class="master-top-bar">
+              <!-- 概览大卡片 -->
+              <div class="overview-hero-card" id="overview-hero-card" title="点击切换：月均成本 / 预计年支出 / 今年已支出">
+                <div class="overview-row-head">
+                  <span id="overview-card-label">概览 · 预估月均成本</span>
+                  <span class="overview-toggle-hint">⇆ 点击切换</span>
+                </div>
+                <div class="overview-val-row">
+                  <strong id="overview-card-amount">¥236.98</strong>
+                  <span id="overview-card-sub">当前生效 8 项</span>
+                </div>
+              </div>
+
+              <!-- 分类过滤 Chips -->
+              <div class="master-filters">
+                <div class="category-chip-row" id="master-category-chips">
+                  <button class="filter-chip active" data-category="全部">全部</button>
+                  <button class="filter-chip" data-category="AI">AI</button>
+                  <button class="filter-chip" data-category="影音">影音</button>
+                  <button class="filter-chip" data-category="云服务">云服务</button>
+                  <button class="filter-chip" data-category="其他">其他</button>
+                </div>
+              </div>
+
+              <!-- 排序与紧凑模式工具条 -->
+              <div class="master-list-controls">
+                <div>
+                  <span>排序：</span>
+                  <select class="sort-select" id="master-sort-select" aria-label="订阅列表排序">
+                    <option value="新添加排在上方">新添加在上</option>
+                    <option value="新添加排在下方">新添加在下</option>
+                    <option value="即将到期排在上方">即将到期在上</option>
+                  </select>
+                </div>
+                <button class="layout-toggle-btn" id="btn-toggle-compact" title="切换紧凑视图">▤ 紧凑模式</button>
+              </div>
+            </div>
+
+            <!-- 订阅列表流 -->
+            <div class="master-list" id="master-subscription-list" role="listbox" aria-label="订阅列表">
+              <!-- JS 动态渲染订阅卡片 -->
+            </div>
+          </div>
+
+          <!-- 右侧 Detail 详情工作台 -->
+          <div class="detail-pane" id="detail-scroll-pane">
+            <div class="detail-empty-state" id="detail-empty-pane" hidden>
+              <svg class="icon" style="width:48px;height:48px;margin:0 auto 16px;color:var(--text-faint);" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <h3 style="font-size:15px;margin-bottom:8px;">未找到符合条件的订阅</h3>
+              <p style="font-size:12.5px;color:var(--text-muted);line-height:1.5;">当前筛选或搜索条件下无匹配项，可清空条件或直接添加新订阅</p>
+              <button class="btn-action-primary" id="btn-empty-clear" style="margin-top:18px;display:inline-block;">重置筛选条件</button>
+            </div>
+            <div class="detail-workspace" id="detail-workspace-pane">
+              
+              <!-- 顶部 Hero 卡片 -->
+              <div class="detail-hero-box" id="detail-hero-box">
+                <button class="detail-logo-btn" id="btn-detail-logo" title="更换图标" aria-label="更换图标"></button>
+                <div class="detail-title-col">
+                  <h2 id="detail-item-name">Claude</h2>
+                  <div class="detail-subinfo">
+                    <span>价格：<b id="detail-item-price">$20 USD</b></span>
+                    <span>计费方式：<b id="detail-item-cycle">每月 · 自动扣费</b></span>
+                    <span>开始于：<b id="detail-item-start">2026.09.01</b></span>
+                  </div>
+                </div>
+                <div class="detail-hero-actions">
+                  <button class="category-badge-btn" id="btn-detail-category">AI 分类 ⌄</button>
+                </div>
+              </div>
+
+              <!-- 4 个财务指标卡片 -->
+              <div class="metrics-quad-grid">
+                <div class="metric-card">
+                  <span class="metric-label" id="detail-label-next">下次扣费日 · 30天后</span>
+                  <strong class="metric-value" id="detail-val-next">2026.10.01</strong>
+                </div>
+                <div class="metric-card">
+                  <span class="metric-label">预估月均费</span>
+                  <strong class="metric-value" id="detail-val-monthly">¥134.71</strong>
+                </div>
+                <div class="metric-card">
+                  <span class="metric-label">历史累计消费</span>
+                  <strong class="metric-value" id="detail-val-total">¥134.71</strong>
+                </div>
+                <div class="metric-card">
+                  <span class="metric-label" id="detail-label-yearly">本年消费（预计）</span>
+                  <strong class="metric-value" id="detail-val-yearly">¥606.22</strong>
+                </div>
+              </div>
+
+              <!-- 桌面属性卡片 -->
+              <div class="detail-props-card">
+                <div class="prop-row">
+                  <span>卡片主题色</span>
+                  <button class="color-picker-trigger" id="btn-detail-color">
+                    <i class="color-dot" id="detail-color-indicator"></i>
+                    <span id="detail-color-text">#D97757</span>
+                    <small>⌄</small>
+                  </button>
+                </div>
+                <div class="prop-row">
+                  <div>
+                    <span>到期提醒推送</span>
+                    <small style="display:block;color:var(--text-muted);font-size:11px;margin-top:2px">在下次扣费或到期前发送 Windows 原生通知</small>
+                  </div>
+                  <button class="win-switch" id="switch-detail-notify" aria-label="切换到期提醒"></button>
+                </div>
+              </div>
+
+              <!-- 订阅全生命周期时间线 -->
+              <div class="timeline-section-card">
+                <div class="section-head-title">订阅计费与生命周期时间线</div>
+                <div class="timeline-flow" id="detail-timeline-flow">
+                  <!-- 动态插入事件节点 -->
+                </div>
+              </div>
+
+              <!-- 底部操作按钮栏 -->
+              <div class="detail-action-bar">
+                <div class="primary-action-group" id="detail-action-buttons">
+                  <!-- 动态插入当前订阅的操作按钮 -->
+                </div>
+                <button class="btn-action-danger-link" id="btn-open-delete">删除此订阅</button>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ==================== 2. 统计看板 (Analytics) ==================== -->
+      <section class="view-pane" id="view-analytics" aria-label="统计看板">
+        <div class="view-header">
+          <div class="view-title-group">
+            <h1>统计分析大看板</h1>
+            <p>基于本地计费事件派生的多维财务分析与支出预测</p>
+          </div>
+          <div class="view-header-actions">
+            <div class="year-seg-group" id="stat-year-selector">
+              <button class="seg-pill-btn" data-year="2025">2025 年</button>
+              <button class="seg-pill-btn active" data-year="2026">2026 年</button>
+            </div>
+            <div class="view-mode-seg" id="stat-view-selector">
+              <button class="seg-pill-btn active" data-view="trend">⌁ 趋势图表</button>
+              <button class="seg-pill-btn" data-view="ratio">◔ 分类占比</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="analytics-content">
+          <!-- 分类筛选 -->
+          <div class="analytics-filter-bar">
+            <div class="category-chip-row" id="stat-category-chips">
+              <button class="filter-chip active" data-stat-cat="全部">全部</button>
+              <button class="filter-chip" data-stat-cat="AI">AI</button>
+              <button class="filter-chip" data-stat-cat="影音">影音</button>
+              <button class="filter-chip" data-stat-cat="云服务">云服务</button>
+              <button class="filter-chip" data-stat-cat="其他">其他</button>
+            </div>
+          </div>
+
+          <!-- 3 个 KPI 指标卡 -->
+          <div class="stat-kpi-row" id="stat-kpi-row">
+            <!-- 动态填充 -->
+          </div>
+
+          <!-- 趋势视图 -->
+          <div id="analytics-trend-container">
+            <div class="charts-duo-grid">
+              <!-- 年度对比 -->
+              <div class="chart-box-card">
+                <div class="chart-box-head">
+                  <h3>年度支出趋势对比</h3>
+                  <span id="stat-annual-tag">¥ · 所有分类</span>
+                </div>
+                <div class="svg-plot-wrap" id="chart-annual-svg-wrap"></div>
+              </div>
+
+              <!-- 12 个月折线走势 -->
+              <div class="chart-box-card">
+                <div class="chart-box-head">
+                  <h3 id="stat-monthly-title">2026年月度支出走势</h3>
+                  <span>点按圆点查看单月明细</span>
+                </div>
+                <div class="svg-plot-wrap" id="chart-monthly-svg-wrap"></div>
+              </div>
+            </div>
+
+            <!-- Top 订阅排行 -->
+            <div class="chart-box-card" style="margin-top:20px;">
+              <div class="chart-box-head">
+                <h3 id="stat-top-title">2026年 Top 订阅支出排行</h3>
+                <span>按年总金额排序</span>
+              </div>
+              <div class="top-rank-list" id="stat-top-rank-list"></div>
+            </div>
+          </div>
+
+          <!-- 占比视图 -->
+          <div id="analytics-ratio-container" hidden>
+            <div class="charts-duo-grid">
+              <!-- 年度占比 -->
+              <div class="chart-box-card">
+                <div class="chart-box-head">
+                  <h3 id="stat-ratio-annual-title">2026年 年度分类占比</h3>
+                  <span id="stat-ratio-annual-total">年度总计 ¥1027.96</span>
+                </div>
+                <div class="ratio-content-wrap">
+                  <div class="donut-visual-box"><div class="css-donut" id="donut-annual"></div></div>
+                  <div class="ratio-legend-list" id="legend-annual"></div>
+                </div>
+              </div>
+
+              <!-- 单月占比 -->
+              <div class="chart-box-card">
+                <div class="chart-box-head">
+                  <h3>月度分类占比穿透</h3>
+                  <span id="stat-ratio-month-total">9月总计 ¥79.14</span>
+                </div>
+                <div class="category-chip-row" id="ratio-month-selector" style="margin-bottom:8px;">
+                  <!-- 1~12月按键 -->
+                </div>
+                <div class="ratio-content-wrap">
+                  <div class="donut-visual-box"><div class="css-donut" id="donut-monthly"></div></div>
+                  <div class="ratio-legend-list" id="legend-monthly"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ==================== 3. 平替智选 (Alternatives) ==================== -->
+      <section class="view-pane" id="view-alternatives" aria-label="平替智选">
+        <div class="view-header">
+          <div class="view-title-group">
+            <h1>平替智选矩阵</h1>
+            <p>智能识别功能重叠、周期优化与更高性价比的替代服务方案</p>
+          </div>
+        </div>
+
+        <div class="alternatives-content">
+          <!-- 顶部优化建议卡片 -->
+          <div class="insights-tips-grid">
+            <div class="insight-card">
+              <svg class="icon icon-lg" style="color:var(--brand-accent)" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              <div>
+                <strong>检测到功能重叠</strong>
+                <p>你同时订阅了 Antigravity、ChatGPT（同属于 AI 对话大模型），二选一可每月节省 <em>¥1.33</em>。</p>
+              </div>
+            </div>
+            <div class="insight-card">
+              <svg class="icon icon-lg" style="color:var(--brand-green)" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              <div>
+                <strong>付费周期优化建议</strong>
+                <p>Apple Music 改为年付订阅方案，一年可累计节省 <em>¥22.88</em>（相当于降价 17%）。</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- 订阅选择器 -->
+          <div class="alt-subs-selector" id="alt-target-subs">
+            <!-- 动态生成 -->
+          </div>
+
+          <!-- 平替方案矩阵 -->
+          <div>
+            <h3 style="font-size:15px;font-weight:650;margin-bottom:12px;" id="alt-section-title">「WPS 会员」的高性价比替代方案</h3>
+            <div class="alt-cards-matrix" id="alt-matrix-container">
+              <!-- 动态生成 -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== 4. 服务发现与库 (Service Library) ==================== -->
+      <section class="view-pane" id="view-library" aria-label="服务发现">
+        <div class="view-header">
+          <div class="view-title-group">
+            <h1>服务库与模板</h1>
+            <p>收录 180+ 主流订阅服务，点击卡片即刻一键导入或定制配置</p>
+          </div>
+          <div class="view-header-actions">
+            <input class="lib-search-input" id="lib-filter-input" type="search" placeholder="搜索服务名称，如 Netflix, Spotify, Notion...">
+            <button class="btn-quick-add" id="btn-custom-add-service">+ 自定义空白订阅</button>
+          </div>
+        </div>
+
+        <div class="library-content">
+          <div class="category-chip-row" id="lib-category-chips">
+            <!-- 分类切换 -->
+          </div>
+
+          <div class="service-grid-matrix" id="lib-service-matrix">
+            <!-- 动态生成 180+ 服务卡片 -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== 5. 偏好与数据备份 (Settings & Backup) ==================== -->
+      <section class="view-pane" id="view-settings" aria-label="偏好与备份">
+        <div class="view-header">
+          <div class="view-title-group">
+            <h1>偏好设置与数据管理</h1>
+            <p>Windows 桌面端偏好、本地数据完整备份、还原与键盘快捷键</p>
+          </div>
+        </div>
+
+        <div class="settings-content">
+          
+          <!-- 账号与偏好 -->
+          <div class="settings-group-card">
+            <div class="settings-group-head">显示与界面偏好</div>
+            <div class="setting-item-row">
+              <div class="setting-meta-info">
+                <strong>主题外观模式 (Theme)</strong>
+                <span>切换 Windows 桌面端浅色与深色视觉外观</span>
+              </div>
+              <div class="view-mode-seg" id="theme-mode-selector">
+                <button class="seg-pill-btn active" data-theme-mode="dark">深色模式</button>
+                <button class="seg-pill-btn" data-theme-mode="light">浅色模式</button>
+                <button class="seg-pill-btn" data-theme-mode="system">跟随系统</button>
+              </div>
+            </div>
+            <div class="setting-item-row">
+              <div class="setting-meta-info">
+                <strong>基准货币种类</strong>
+                <span>统计与概览中默认折算的货币</span>
+              </div>
+              <button class="btn-file-backup" id="btn-set-display-currency">¥ 人民币 (CNY) ⌄</button>
+            </div>
+            <div class="setting-item-row">
+              <div class="setting-meta-info">
+                <strong>显示已过期订阅</strong>
+                <span>在主列表中保留历史已终止的订阅项</span>
+              </div>
+              <button class="win-switch on" id="switch-setting-expired"></button>
+            </div>
+            <div class="setting-item-row">
+              <div class="setting-meta-info">
+                <strong>Windows 系统通知权限</strong>
+                <span>在订阅扣费前通过 Windows 操作中心发送 Toast</span>
+              </div>
+              <button class="win-switch" id="switch-setting-toast"></button>
+            </div>
+          </div>
+
+          <!-- 桌面本地数据备份 (核心功能) -->
+          <div class="settings-group-card">
+            <div class="settings-group-head">本地数据完整备份与导出 (Local-First Backup)</div>
+            <div class="setting-item-row">
+              <div class="setting-meta-info">
+                <strong>导出完整 JSON 备份</strong>
+                <span>生成包含 schemaVersion 1.0 的完整订阅、事件历史及偏好的 JSON 文件并保存到本地</span>
+              </div>
+              <button class="btn-file-backup" id="btn-export-json">
+                <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <span>下载 JSON 备份</span>
+              </button>
+            </div>
+            <div class="setting-item-row">
+              <div class="setting-meta-info">
+                <strong>从本地 JSON 文件恢复</strong>
+                <span>选择先前导出的 JSON 备份文件，解析并还原所有订阅及统计数据</span>
+              </div>
+              <button class="btn-file-backup" id="btn-import-json">
+                <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                <span>选择文件恢复</span>
+              </button>
+            </div>
+            <div class="setting-item-row">
+              <div class="setting-meta-info">
+                <strong>导出 CSV 财务明细</strong>
+                <span>导出可供 Excel 或表格软件打开的纯文本 CSV 订阅明细表</span>
+              </div>
+              <button class="btn-file-backup" id="btn-export-csv">
+                <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                <span>导出 CSV</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 快捷键指南 -->
+          <div class="settings-group-card">
+            <div class="settings-group-head">Windows 桌面快捷键指南</div>
+            <div class="setting-item-row">
+              <span>新建订阅抽屉</span>
+              <kbd style="font-family:var(--font-mono);background:rgba(255,255,255,0.08);padding:2px 6px;border-radius:4px">Ctrl + N</kbd>
+            </div>
+            <div class="setting-item-row">
+              <span>聚焦全局搜索框</span>
+              <kbd style="font-family:var(--font-mono);background:rgba(255,255,255,0.08);padding:2px 6px;border-radius:4px">Ctrl + F</kbd>
+            </div>
+            <div class="setting-item-row">
+              <span>切换视图 (1~5)</span>
+              <kbd style="font-family:var(--font-mono);background:rgba(255,255,255,0.08);padding:2px 6px;border-radius:4px">Ctrl + 1 ~ 5</kbd>
+            </div>
+            <div class="setting-item-row">
+              <span>关闭弹窗 / 抽屉</span>
+              <kbd style="font-family:var(--font-mono);background:rgba(255,255,255,0.08);padding:2px 6px;border-radius:4px">Esc</kbd>
+            </div>
+          </div>
+
+          <!-- 产品逻辑与关于 -->
+          <div class="settings-group-card">
+            <div class="settings-group-head">关于与产品逻辑</div>
+            <div class="setting-item-row">
+              <div class="setting-meta-info">
+                <strong>首页概览计算口径</strong>
+                <span>月均预估折算公式与年度实际支出口径说明</span>
+              </div>
+              <button class="btn-file-backup" id="btn-open-logic-dialog">查看说明</button>
+            </div>
+            <div class="setting-item-row" id="row-setting-rates" style="cursor:pointer">
+              <div class="setting-meta-info">
+                <strong>汇率更新与折算规则</strong>
+                <span>初期支持手动微调牌价，后期支持自动联网同步</span>
+              </div>
+              <button class="btn-file-backup" id="btn-open-rates-dialog">更新汇率</button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ==================== 底部状态栏 ==================== -->
+  <footer class="statusbar" aria-label="状态栏">
+    <div class="status-left">
+      <div class="status-item clickable" id="statusbar-db" title="点击查看本地 SQLite 数据库引擎状态">
+        <i class="status-dot"></i>
+        <span>SQLite 离线引擎：就绪</span>
+      </div>
+      <div class="status-item clickable" id="statusbar-queue" title="点击查看离线变更待同步队列">
+        <span>同步队列：0 项待同步</span>
+      </div>
+      <div class="status-item" id="statusbar-subs-summary">
+        <span>有效订阅：8 项</span>
+      </div>
+    </div>
+    <div class="status-right">
+      <div class="status-item clickable" id="statusbar-rates" title="点击查看当前汇率牌价换算规则">
+        <span>当前汇率基准：1 USD ≈ 6.78 CNY · 100 JPY ≈ 4.22 CNY · 1 EUR ≈ 7.83 CNY ℹ</span>
+      </div>
+      <div class="status-item">
+        <span style="color:var(--text-faint)">Windows Preview · 订小阅</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==================== 桌面抽屉：新建/编辑订阅 ==================== -->
+  <div class="drawer-overlay" id="drawer-add" role="dialog" aria-modal="true" aria-labelledby="drawer-add-title">
+    <div class="drawer-panel">
+      <div class="drawer-header">
+        <h3 id="drawer-add-title">添加订阅服务</h3>
+        <button class="drawer-close-btn" data-close aria-label="关闭抽屉">✕</button>
+      </div>
+      <div class="drawer-body">
+        
+        <div style="display:flex;gap:12px;align-items:center;padding:12px;background:rgba(255,255,255,0.03);border-radius:var(--radius-md);border:1px solid var(--line);">
+          <button class="icon-tile-btn" id="drawer-add-logo-btn" title="选择图标" style="width:48px;height:48px;border-radius:10px;">➤</button>
+          <div style="flex:1;">
+            <input class="form-control" id="drawer-add-name" placeholder="订阅名称，如 Netflix" maxlength="60">
+          </div>
+        </div>
+
+        <div class="form-row-duo">
+          <div class="form-group">
+            <label for="drawer-add-price">价格</label>
+            <input class="form-control" id="drawer-add-price" type="number" min="0" step="0.01" value="0">
+          </div>
+          <div class="form-group">
+            <label for="drawer-add-currency">货币</label>
+            <select class="form-control" id="drawer-add-currency">
+              <option value="CNY">¥ 人民币 (CNY)</option>
+              <option value="USD">$ 美元 (USD)</option>
+              <option value="JPY">¥ 日元 (JPY)</option>
+              <option value="EUR">€ 欧元 (EUR)</option>
+              <option value="GBP">£ 英镑 (GBP)</option>
+              <option value="HKD">HK$ 港币 (HKD)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row-duo">
+          <div class="form-group">
+            <label for="drawer-add-category">服务分类</label>
+            <select class="form-control" id="drawer-add-category">
+              <option value="AI">AI</option>
+              <option value="影音">影音</option>
+              <option value="工具效率">工具效率</option>
+              <option value="阅读知识">阅读知识</option>
+              <option value="生活服务">生活服务</option>
+              <option value="云服务">云服务</option>
+              <option value="游戏">游戏</option>
+              <option value="社交">社交</option>
+              <option value="其他">其他</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>续费方式</label>
+            <div class="view-mode-seg" style="height:36px">
+              <button class="seg-pill-btn active" id="btn-renew-auto" style="flex:1">自动扣费</button>
+              <button class="seg-pill-btn" id="btn-renew-manual" style="flex:1">手动续费</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group" id="row-add-cycle">
+          <label for="drawer-add-cycle">扣费周期</label>
+          <select class="form-control" id="drawer-add-cycle">
+            <option value="1">每月 (1个月)</option>
+            <option value="3">每季 (3个月)</option>
+            <option value="6">每半年 (6个月)</option>
+            <option value="12">每年 (12个月)</option>
+            <option value="36">三年付 (36个月)</option>
+          </select>
+        </div>
+
+        <div class="form-group" id="row-add-duration" hidden>
+          <label for="drawer-add-duration">购买时长（月）</label>
+          <input class="form-control" id="drawer-add-duration" type="number" min="1" max="1200" value="12">
+        </div>
+
+        <div class="form-row-duo">
+          <div class="form-group">
+            <label for="drawer-add-start">起始时间</label>
+            <input class="form-control" id="drawer-add-start" type="date" value="2026-09-01">
+          </div>
+          <div class="form-group">
+            <label>卡片主题色</label>
+            <button class="form-control" id="btn-drawer-add-color" style="text-align:left;display:flex;align-items:center;gap:8px;">
+              <i class="color-dot" id="drawer-add-color-dot" style="background:#D97757"></i>
+              <span id="drawer-add-color-text">#D97757</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="drawer-add-memo">备注信息</label>
+          <textarea class="form-control" id="drawer-add-memo" style="height:68px;padding:8px 12px;resize:none" placeholder="选填，如绑定信用卡、账号等..."></textarea>
+        </div>
+
+        <p class="form-error-msg" id="drawer-add-error" role="alert"></p>
+      </div>
+      <div class="drawer-footer">
+        <button class="btn-action-secondary" data-close>取消</button>
+        <button class="btn-action-primary" id="btn-save-subscription">保存并添加</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 模态框：订阅更新 (Update Dialog) ==================== -->
+  <div class="modal-overlay" id="modal-update" role="dialog" aria-modal="true" aria-labelledby="modal-update-title">
+    <div class="modal-dialog">
+      <div class="modal-header" id="modal-update-title">订阅更新与价格调整</div>
+      <div class="modal-content">
+        <div style="font-size:12px;color:var(--text-muted);">
+          当前方案：<strong id="update-current-price-text" style="color:var(--text-main);">$20 · 美元 · 每月</strong>
+        </div>
+        
+        <div class="form-group">
+          <label>生效方式</label>
+          <div class="view-mode-seg" style="height:36px">
+            <button class="seg-pill-btn active" id="btn-update-mode-next" data-update-mode="next" style="flex:1">下个账期起</button>
+            <button class="seg-pill-btn" id="btn-update-mode-now" data-update-mode="now" style="flex:1">立即生效 (升级/补差价)</button>
+          </div>
+        </div>
+
+        <div class="form-row-duo">
+          <div class="form-group">
+            <label for="update-new-price">新方案价格</label>
+            <input class="form-control" id="update-new-price" type="number" min="0" step="0.01" value="30">
+          </div>
+          <div class="form-group">
+            <label for="update-new-currency">结算货币</label>
+            <select class="form-control" id="update-new-currency">
+              <option value="USD">$ 美元 (USD)</option>
+              <option value="CNY">¥ 人民币 (CNY)</option>
+              <option value="JPY">¥ 日元 (JPY)</option>
+              <option value="EUR">€ 欧元 (EUR)</option>
+              <option value="HKD">HK$ 港币 (HKD)</option>
+              <option value="GBP">£ 英镑 (GBP)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 下个账期生效字段 -->
+        <div class="form-group" id="update-next-cycle-group">
+          <label for="update-effective-month">首次按新价格扣费账期</label>
+          <select class="form-control" id="update-effective-month"></select>
+          <small style="font-size:11px;color:var(--text-muted);margin-top:4px;" id="update-effective-hint">预计生效日期：2026.10.01</small>
+        </div>
+
+        <!-- 立即生效专属字段 -->
+        <div id="update-now-fields" hidden style="display:flex;flex-direction:column;gap:12px;">
+          <div class="form-row-duo">
+            <div class="form-group">
+              <label for="update-upgrade-date">升级/变更日期</label>
+              <input class="form-control" id="update-upgrade-date" type="date" value="2026-09-01">
+            </div>
+            <div class="form-group">
+              <label for="update-diff-amount">立即支付补差价金额</label>
+              <input class="form-control" id="update-diff-amount" type="number" min="0" step="0.01" value="10">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>后续扣费日规则</label>
+            <div class="view-mode-seg" style="height:34px">
+              <button class="seg-pill-btn active" id="btn-anchor-keep" data-anchor="keep" style="flex:1">保持原扣费日</button>
+              <button class="seg-pill-btn" id="btn-anchor-reset" data-anchor="reset" style="flex:1">按升级日起重新计费</button>
+            </div>
+            <small style="font-size:11px;color:var(--text-muted);margin-top:4px;" id="update-anchor-hint">保持原扣费日：下次扣费仍为 2026.10.01</small>
+          </div>
+
+          <div style="background:var(--bg-chip);padding:10px 12px;border-radius:var(--radius-sm);font-size:11px;color:var(--text-muted);line-height:1.5;">
+            💡 <strong>立即生效说明</strong>：确认后当前订阅价格立即刷新为新价格，重新折算月均成本，并在时间线上记录【套餐升级 · 立即生效】节点。
+          </div>
+        </div>
+
+        <p class="form-error-msg" id="update-error-msg" role="alert"></p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-action-secondary" data-close>取消</button>
+        <button class="btn-action-primary" id="btn-confirm-update">确认更新</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 模态框：停止订阅 (Stop Dialog) ==================== -->
+  <div class="modal-overlay" id="modal-stop" role="dialog" aria-modal="true" aria-labelledby="modal-stop-title">
+    <div class="modal-dialog">
+      <div class="modal-header" id="modal-stop-title">停止自动续费</div>
+      <div class="modal-content">
+        <p style="color:var(--text-muted);line-height:1.5;">
+          请选择最后一个付费账期。在此账期到期后，将不再产生后续自动扣费预测，但过往历史账单依然保留。
+        </p>
+        <div class="form-group">
+          <label for="stop-select-month">最后付费账期</label>
+          <select class="form-control" id="stop-select-month"></select>
+        </div>
+        <div style="font-size:12px;color:var(--text-muted);">
+          服务预计到期日：<strong id="stop-calc-expiry" style="color:var(--brand-danger)">2026.09.30</strong>
+        </div>
+        <p class="form-error-msg" id="stop-error-msg" role="alert"></p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-action-secondary" data-close>取消</button>
+        <button class="btn-action-primary" id="btn-confirm-stop" style="background:var(--brand-danger)">确认停止</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 模态框：删除确认 (Delete Dialog) ==================== -->
+  <div class="modal-overlay" id="modal-delete" role="alertdialog" aria-modal="true" aria-labelledby="modal-delete-title">
+    <div class="modal-dialog">
+      <div class="modal-header" id="modal-delete-title" style="color:var(--brand-danger)">⚠️ 警告：该操作不可撤销</div>
+      <div class="modal-content">
+        <p style="color:var(--text-muted);line-height:1.6;">
+          该订阅及其所有关联事件将被彻底删除，并且不再计入任何统计图表。如果您未来可能重新激活该服务，建议使用「停止订阅」功能。
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-action-secondary" data-close>取消</button>
+        <button class="btn-action-primary" id="btn-confirm-delete" style="background:var(--brand-danger)">确认删除</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 模态框：图标选择器 (Icon Picker) ==================== -->
+  <div class="modal-overlay" id="modal-icons" role="dialog" aria-modal="true" aria-labelledby="modal-icons-title">
+    <div class="modal-dialog" style="width:480px;">
+      <div class="modal-header" id="modal-icons-title">选择订阅图标</div>
+      <div class="modal-content">
+        <input class="form-control" id="icon-search-input" placeholder="搜索品牌或图标，如 chatgpt, apple, music...">
+        <div class="icon-picker-grid" id="icon-picker-grid"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-action-secondary" data-close>关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 模态框：调色板选择器 (Color Picker) ==================== -->
+  <div class="modal-overlay" id="modal-colors" role="dialog" aria-modal="true" aria-labelledby="modal-colors-title">
+    <div class="modal-dialog" style="width:380px;">
+      <div class="modal-header" id="modal-colors-title">选择卡片主题色</div>
+      <div class="modal-content">
+        <div class="color-swatch-grid" id="color-swatch-grid"></div>
+        <div class="form-group" style="margin-top:12px;">
+          <label for="custom-hex-color">自定义 Hex 颜色代码</label>
+          <input class="form-control" id="custom-hex-color" type="color" value="#d97757" style="height:40px;padding:2px">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-action-secondary" data-close>取消</button>
+        <button class="btn-action-primary" id="btn-confirm-color">确定</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 模态框：逻辑说明 (Logic Dialog) ==================== -->
+  <div class="modal-overlay" id="modal-logic" role="dialog" aria-modal="true" aria-labelledby="modal-logic-title">
+    <div class="modal-dialog" style="width:520px;">
+      <div class="modal-header" id="modal-logic-title">订小阅 · 计费与概览逻辑说明</div>
+      <div class="modal-content" style="line-height:1.6;color:var(--text-muted);">
+        <h4 style="color:#fff;font-size:13px;margin-bottom:4px;">「月均成本」— 平摊预估</h4>
+        <p style="font-size:12px;margin-bottom:12px;">
+          将所有当前正在生效的订阅，按各自付费周期折算为标准单月金额后求和。例如年付 120 元的服务折算为 10 元/月。反映的是“若当前订阅长期持续，每月平摊预算”。
+        </p>
+        <h4 style="color:#fff;font-size:13px;margin-bottom:4px;">「预计年支出」— 全年预测</h4>
+        <p style="font-size:12px;margin-bottom:12px;">
+          统计今年 1 月 1 日至 12 月 31 日之间，已产生的实际账单加上未来月份预计扣费的完整总和。
+        </p>
+        <h4 style="color:#fff;font-size:13px;margin-bottom:4px;">「今年已支出」— 实际扣费</h4>
+        <p style="font-size:12px;">
+          仅统计从今年 1 月 1 日起至今，每个订阅实际已经扣款付款的历史流水之和。
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-action-primary" data-close>我明白了</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 模态框：汇率更新与折算规则 (Exchange Rates Dialog) ==================== -->
+  <div class="modal-overlay" id="modal-rates" role="dialog" aria-modal="true" aria-labelledby="modal-rates-title">
+    <div class="modal-dialog" style="max-width: 520px;">
+      <div class="modal-header" id="modal-rates-title">汇率更新与折算规则</div>
+      <div class="modal-content">
+        <!-- 模式提示 -->
+        <div style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 12px; color: var(--text-muted);">更新模式：</span>
+          <div style="display: flex; gap: 6px;">
+            <span class="tag-badge" style="background: rgba(105, 93, 255, 0.2); color: var(--brand-primary); font-size: 11px;">初期：手动维护（已支持）</span>
+            <span class="tag-badge manual" style="font-size: 11px;">后期：自动联网同步（预留）</span>
+          </div>
+        </div>
+
+        <!-- 手动修改牌价网格 (初期支持) -->
+        <div style="font-size: 12px; font-weight: 600; margin-bottom: 8px;">外币对人民币 (CNY) 中间价设置：</div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px;">
+          <div class="form-group" style="margin-bottom: 0;">
+            <label for="rate-input-usd" style="font-size: 11px;">1 美元 (USD)</label>
+            <input class="form-control" id="rate-input-usd" type="number" step="0.0001" min="0" value="6.7829">
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label for="rate-input-jpy" style="font-size: 11px;">1 日元 (JPY) <span style="color: var(--text-faint); font-weight: normal;">(100 JPY ≈ 4.22)</span></label>
+            <input class="form-control" id="rate-input-jpy" type="number" step="0.0001" min="0" value="0.0422">
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label for="rate-input-eur" style="font-size: 11px;">1 欧元 (EUR)</label>
+            <input class="form-control" id="rate-input-eur" type="number" step="0.0001" min="0" value="7.8267">
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label for="rate-input-gbp" style="font-size: 11px;">1 英镑 (GBP)</label>
+            <input class="form-control" id="rate-input-gbp" type="number" step="0.0001" min="0" value="9.1278">
+          </div>
+          <div class="form-group" style="margin-bottom: 0; grid-column: span 2;">
+            <label for="rate-input-hkd" style="font-size: 11px;">1 港币 (HKD)</label>
+            <input class="form-control" id="rate-input-hkd" type="number" step="0.0001" min="0" value="0.8650">
+          </div>
+        </div>
+
+        <!-- 联网更新操作 (后期支持规划与模拟) -->
+        <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid var(--line); border-radius: var(--radius-md); padding: 10px 12px; margin-bottom: 14px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <div>
+              <div style="font-size: 12px; font-weight: 600;">联网获取最新汇率（后期支持）</div>
+              <div style="font-size: 11px; color: var(--text-muted);" id="rate-sync-status-text">已加载本地基准缓存 · 2026-09-03</div>
+            </div>
+            <button class="btn-file-backup" id="btn-fetch-online-rates" style="padding: 4px 10px; font-size: 11px;">⚡ 联网拉取最新牌价</button>
+          </div>
+          <div style="font-size: 11px; color: var(--text-faint); line-height: 1.4;">
+            后期将支持定时自动同步中国外汇交易中心（CFETS）当日最新中间价；断网时自动使用本地安全缓存。
+          </div>
+        </div>
+
+        <!-- 汇率说明放在选项里面 (用户明确要求) -->
+        <div style="background: var(--bg-surface-elevated); border: 1px dashed var(--line); border-radius: var(--radius-md); padding: 12px; font-size: 11px; line-height: 1.6; color: var(--text-muted);">
+          <div style="font-weight: 600; color: var(--text-main); margin-bottom: 6px; display: flex; align-items: center; gap: 4px;">
+            <span>ℹ 汇率折算规则说明</span>
+          </div>
+          <ul style="margin: 0; padding-left: 16px;">
+            <li><strong>统一折算基准</strong>：外币订阅（如 ChatGPT 的日元、Claude 的美元）统一按设定的汇率折算为人民币（CNY），计入首页月均成本、预计年支出及分类开销占比。</li>
+            <li><strong>周期与计费分摊</strong>：外币月付订阅按“外币单价 × 实时汇率”折算月均；非月付（年付/季付）按账期总月数平摊折算。</li>
+            <li><strong>生效时机与历史账目</strong>：汇率调整仅重算外币订阅的未结账期预测与月均指标；已扣费的历史流水保留原扣费入账金额不变，防止财务账目失真。</li>
+            <li><strong>官方基准牌价</strong>：默认牌价参考中国外汇交易中心（CFETS）当日官方人民币汇率中间价。</li>
+          </ul>
+        </div>
+      </div>
+      <div class="modal-footer" style="display: flex; justify-content: space-between;">
+        <button class="btn-action-secondary" id="btn-reset-default-rates" style="font-size: 11px;">恢复默认参考价</button>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn-action-secondary" data-close>取消</button>
+          <button class="btn-action-primary" id="btn-save-rates">保存并应用新汇率</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 隐藏的文件选择输入 (JSON 恢复) -->
+  
+  <!-- ==================== 模态框：手动续费记录 (Renew Dialog) ==================== -->
+  <div class="modal-overlay" id="modal-renew" role="dialog" aria-modal="true" aria-labelledby="modal-renew-title">
+    <div class="modal-dialog">
+      <div class="modal-header" id="modal-renew-title">添加手动续费记录</div>
+      <div class="modal-content">
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px;">
+          当前服务：<strong id="renew-sub-name" style="color:var(--text-main);">WPS 会员</strong> · 到期日：<span id="renew-current-due">2029.07.25</span>
+        </div>
+        <div class="form-row-duo">
+          <div class="form-group">
+            <label for="renew-input-price">本次续费实付金额</label>
+            <input class="form-control" id="renew-input-price" type="number" min="0" step="0.01" value="177">
+          </div>
+          <div class="form-group">
+            <label for="renew-input-currency">结算货币</label>
+            <select class="form-control" id="renew-input-currency">
+              <option value="CNY">¥ 人民币 (CNY)</option>
+              <option value="USD">$ 美元 (USD)</option>
+              <option value="JPY">¥ 日元 (JPY)</option>
+              <option value="EUR">€ 欧元 (EUR)</option>
+              <option value="HKD">HK$ 港币 (HKD)</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row-duo">
+          <div class="form-group">
+            <label for="renew-input-months">延长周期 (月数)</label>
+            <select class="form-control" id="renew-input-months">
+              <option value="1">1 个月</option>
+              <option value="3">3 个月 (季度)</option>
+              <option value="6">6 个月 (半年)</option>
+              <option value="12" selected>12 个月 (1年)</option>
+              <option value="24">24 个月 (2年)</option>
+              <option value="36">36 个月 (3年)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="renew-input-date">续费记录日期</label>
+            <input class="form-control" id="renew-input-date" type="date" value="2026-09-01">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="renew-input-memo">续费备注 (选填)</label>
+          <input class="form-control" id="renew-input-memo" placeholder="如：官方大促折扣、兑换卡激活等">
+        </div>
+        <div style="background:var(--bg-chip);padding:10px 12px;border-radius:var(--radius-sm);font-size:11px;color:var(--text-muted);line-height:1.5;">
+          预计续期后到期日：<strong id="renew-preview-next" style="color:var(--brand-green);">2030.07.25</strong>，并将自动向订阅时间线追加一条【手动续费】记录。
+        </div>
+        <p class="form-error-msg" id="renew-error-msg" role="alert"></p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-action-secondary" data-close>取消</button>
+        <button class="btn-action-primary" id="btn-confirm-renew">确认并入账</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 模态框：快速切换分类 (Category Dialog) ==================== -->
+  <div class="modal-overlay" id="modal-category" role="dialog" aria-modal="true" aria-labelledby="modal-category-title">
+    <div class="modal-dialog" style="width:380px;">
+      <div class="modal-header" id="modal-category-title">修改订阅所属分类</div>
+      <div class="modal-content">
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;" id="category-selector-grid"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-action-secondary" data-close>取消</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 模态框：基准货币选择 (Currency Dialog) ==================== -->
+  <div class="modal-overlay" id="modal-currency" role="dialog" aria-modal="true" aria-labelledby="modal-currency-title">
+    <div class="modal-dialog" style="width:380px;">
+      <div class="modal-header" id="modal-currency-title">选择系统基准货币</div>
+      <div class="modal-content">
+        <div style="display:flex;flex-direction:column;gap:8px;" id="currency-options-list"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-action-secondary" data-close>关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 模态框：本地 SQLite 引擎与同步详情 (DB Info) ==================== -->
+  <div class="modal-overlay" id="modal-db" role="dialog" aria-modal="true" aria-labelledby="modal-db-title">
+    <div class="modal-dialog" style="width:500px;">
+      <div class="modal-header" id="modal-db-title">本地优先 (Local-First) 架构就绪状态</div>
+      <div class="modal-content" style="font-size:12.5px;color:var(--text-muted);line-height:1.6;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+          <div style="background:var(--bg-chip);padding:12px;border-radius:var(--radius-sm);">
+            <div style="color:var(--text-faint);font-size:11px;">底层引擎</div>
+            <strong style="color:var(--text-main);font-size:13px;">Drift + SQLite 3</strong>
+          </div>
+          <div style="background:var(--bg-chip);padding:12px;border-radius:var(--radius-sm);">
+            <div style="color:var(--text-faint);font-size:11px;">Schema 版本</div>
+            <strong style="color:var(--text-main);font-size:13px;">schemaVersion 1.0</strong>
+          </div>
+          <div style="background:var(--bg-chip);padding:12px;border-radius:var(--radius-sm);">
+            <div style="color:var(--text-faint);font-size:11px;">本地记录统计</div>
+            <strong id="db-stat-record-count" style="color:var(--text-main);font-size:13px;">8 项订阅 · 15 条计费事件</strong>
+          </div>
+          <div style="background:var(--bg-chip);padding:12px;border-radius:var(--radius-sm);">
+            <div style="color:var(--text-faint);font-size:11px;">离线同步 Outbox</div>
+            <strong style="color:var(--brand-green);font-size:13px;">0 项挂起 (已完整本地持久化)</strong>
+          </div>
+        </div>
+        <p>
+          订小阅遵循「本地优先」原则：即便在无网络或未连接个人同步服务器时，桌面端所有的创建、计费升级、续费与停止操作均完整保存于本地 SQLite 事务中。
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-action-primary" data-close>关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <input type="file" id="hidden-file-input" accept=".json">
+
+  <!-- 桌面 Toast 通知 -->
+  <div class="desktop-toast" id="desktop-toast" role="status" aria-live="polite">
+    <svg class="icon icon-sm toast-icon" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>
+    <span id="toast-text-content">提示信息</span>
+  </div>
+
+  <!-- ==================== JavaScript 原型引擎 ==================== -->
+  <script>
+    // 基础数据与核对样本 (与移动端原型完全保持 100% 领域一致性)
+    const subscriptions = {
+      claude: { name:'Claude', logo:'A⌁', logoClass:'claude-logo', category:'AI', price:'$20 USD', cycle:'每月 · 自动扣费', nextLabel:'下次扣费日 · 30天后', next:'2026.10.01', monthly:'¥134.71', total:'¥134.71', yearly:'¥606.22', start:'2026.09.01', color:'#D97757', note:'$20 · 美元 · 月付', promo:true, future:[['2026.10.01','订阅更新','$20 · 美元 · 月付 → $30 · 美元 · 月付','future'],['2026.12.01','优惠结束','恢复 $20 · 美元 · 月付','hollow']] },
+      wps: { name:'WPS 会员', logo:'W', logoClass:'wps-logo', category:'云服务', price:'¥177 CNY', cycle:'三年 · 已付费', nextLabel:'到期日 · 约34个月后', next:'2029.07.25', monthly:'¥4.92', total:'¥177.00', yearly:'¥59.00', start:'2026.07.26', color:'#E64F20', note:'¥177 · 人民币 · 三年付' },
+      xsus: { name:'XSUS', logo:'▰', logoClass:'xsus-logo', category:'其他', price:'¥12 CNY', cycle:'每月 · 自动扣费', nextLabel:'下次扣费日 · 17天后', next:'2026.09.18', monthly:'¥12.00', total:'¥96.00', yearly:'¥144.00', start:'2026.01.18', color:'#D64453', note:'¥12 · 人民币 · 月付' },
+      bilibili: { name:'Bilibili 大会员', logo:'▣', logoClass:'bili-logo', category:'影音', price:'¥0 CNY', cycle:'限时免费 · 到期停止', nextLabel:'到期日 · 30天后', next:'2026.10.01', monthly:'¥0.00', total:'¥0.00', yearly:'¥0.00', start:'2026.08.02', color:'#19A9D2', note:'¥0 · 人民币 · 试用' },
+      apple: { name:'Apple Music', logo:'♪', logoClass:'apple-logo', category:'影音', price:'¥7 CNY', cycle:'每月 · 自动扣费', nextLabel:'下次扣费日 · 28天后', next:'2026.09.29', monthly:'¥7.00', total:'¥42.00', yearly:'¥84.00', start:'2026.03.29', color:'#EF4055', note:'¥7 · 人民币 · 月付' },
+      anti: { name:'Antigravity', logo:'●', logoClass:'anti-logo', category:'AI', price:'¥16 CNY', cycle:'每年 · 自动扣费', nextLabel:'下次扣费日 · 302天后', next:'2027.06.30', monthly:'¥1.33', total:'¥16.00', yearly:'¥16.00', start:'2026.06.30', color:'#4F7EE9', note:'¥16 · 人民币 · 年付' },
+      tencent: { name:'腾讯视频', logo:'▶', category:'影音', price:'¥200 CNY', cycle:'每年 · 自动扣费', nextLabel:'下次扣费日 · 38天后', next:'2026.10.09', monthly:'¥16.67', total:'¥200.00', yearly:'¥200.00', start:'2025.10.09', color:'#FFAE35', note:'¥200 · 人民币 · 年付' },
+      chatgpt: { name:'ChatGPT', logo:'◎', category:'AI', price:'¥1430 JPY', cycle:'每月 · 自动扣费', nextLabel:'下次扣费日 · 21天后', next:'2026.09.22', monthly:'¥60.35', total:'¥120.69', yearly:'¥362.09', start:'2026.07.22', color:'#10A37F', note:'¥2860 · 日元 · 月付', future:[['2026.08.01','套餐升级','即日起按 ¥1430/月 扣费','future'],['2026.09.22','下次扣费','¥1430 · 日元 · 月付','hollow']] }
+    };
+    Object.assign(subscriptions.wps, {manual:true, color:'#D4252B', cycle:'手动续费', yearly:'¥25.68', nextLabel:'到期日 · 1058天后', note:'¥177 · 人民币 · 36个月'});
+    Object.assign(subscriptions.bilibili, {manual:true, cycle:'手动续费'});
+
+    const currencyNames = { CNY:'¥ 人民币', USD:'$ 美元', EUR:'€ 欧元', GBP:'£ 英镑', JPY:'¥ 日元', HKD:'HK$ 港币', TWD:'NT$ 新台币', KRW:'₩ 韩元', SGD:'S$ 新加坡元', AUD:'A$ 澳元', CAD:'C$ 加拿大元' };
+    const cycleNames = {1:'每月',3:'每季',6:'每半年',12:'每年',36:'三年付'};
+    const categoryColors = {'AI':'#695dff','影音':'#ff696c','云服务':'#48b4d0','其他':'#a5a5a5','工具效率':'#4f7ee9','阅读知识':'#ffae35','生活服务':'#3ec487','游戏':'#ad3490','社交':'#2aabee'};
+    const categories = ['全部','AI','影音','工具效率','阅读知识','生活服务','云服务','游戏','社交','其他'];
+
+    const libraryGroups = {
+      'AI':'Kimi|文心一言|通义千问|豆包|智谱清言|讯飞星火|海螺AI|天工AI|腾讯元宝|DeepSeek|Trae|360智脑|百川智能|CodeGeeX|阶跃星辰|可灵AI|即梦AI|Vidu|MiniMax|Coze',
+      '影音':'Bilibili 大会员|爱奇艺|优酷|腾讯视频|芒果TV|QQ音乐|网易云音乐|酷狗音乐|酷我音乐|咪咕视频|汽水音乐|小宇宙|红果短剧',
+      '工具效率':'滴答清单|FlowUs 息流|有道云笔记|石墨文档|幕布|扫描全能王|剪映|夸克网盘|迅雷|腾讯会议|QQ邮箱会员|苹果开发者|力扣会员|美图秀秀|Nexitally|Flomo|UU加速器|沉浸式翻译|微信读书',
+      '阅读知识':'得到|QQ阅读|喜马拉雅|帆书|知识星球|知乎盐选会员|快看漫画|腾讯动漫|洪恩识字|宝宝巴士|斑马AI学|番茄小说',
+      '生活服务':'饿了么会员|美团会员|京东PLUS|淘宝88VIP|山姆会员|滴滴出行会员|携程超级会员|盒马会员|彩云天气|哈啰单车|英语流利说|扇贝单词',
+      '云服务':'腾讯云|阿里云|华为云|百度智能云|火山引擎',
+      '游戏':'原神月卡|崩坏：星穹铁道月卡',
+      '社交':'Weibo会员|陌陌会员',
+      '其他':'Keep 会员|WPS 会员|百度网盘|阿里云盘'
+    };
+    const extraLibrary = {
+      'AI':'ChatGPT|Claude|Gemini|Midjourney|GitHub Copilot|Notion AI|Cursor|Perplexity|Poe|Jasper|Grammarly Premium|Adobe Firefly|Windsurf|Zed|Antigravity|DeepL Pro|Monica|Replit|Luma AI|Stability AI|Grok|Groq|Microsoft Copilot|ElevenLabs|Flowith|Ideogram|Krea|Lovable|Manus|NotebookLM|Phind|Pika|Recraft|Runway|Suno|v0|OpenRouter|Google Colab|LangSmith|Langfuse|Haiper|PixVerse',
+      '影音':'Netflix|YouTube|Spotify|Apple Music|Disney+|HBO|Amazon Prime Video|Apple TV+|Hulu|Paramount+|Peacock|Tidal|Deezer|SoundCloud Go+',
+      '工具效率':'Notion|Todoist|1Password|LastPass|Dropbox|Google One|iCloud+|Microsoft 365|Adobe Creative Cloud|Figma|Canva|Slack|Zoom|Linear|Obsidian Sync|Evernote|Bear|Setapp|CleanMyMac|Fantastical|Things 3|Craft|Raindrop.io|Tello|Typeless',
+      '阅读知识':'Kindle Unlimited|Medium|The Information|华尔街日报|纽约时报|Readwise|Pocket Premium|Instapaper Pro',
+      '云服务':'AWS|Google Cloud|Azure|Vercel|Netlify|DigitalOcean|Cloudflare|Heroku|Railway|Supabase Pro|PlanetScale',
+      '游戏':'Xbox Game Pass|PlayStation Plus|Nintendo Switch Online|Steam|EA Play|Apple Arcade',
+      '社交':'Twitter/X Premium|Discord Nitro|Telegram Premium|LinkedIn Premium|Reddit Premium',
+      '其他':'Costco会员|ExpressVPN|NordVPN|Surfshark|Namecheap 域名|GoDaddy 域名|Cloudflare 域名|Duolingo Plus|Strava|Headspace|Calm'
+    };
+    const library = Object.entries(libraryGroups).concat(Object.entries(extraLibrary)).flatMap(([category,names]) => names.split('|').map(name => ({name,category})));
+    
+    const altData = {
+      wps:[['FlowUs 息流','¥18 /人/月','面向个人和小团队的 All-in-one 协作工具，近年增长很快','文档协作|知识库|项目管理|AI 助手','省 ¥159/月'],['腾讯文档','¥18 /人/月','中国用户使用广泛，微信和 QQ 场景里的协作办公体验很强','多人协作|云端 Office|模板丰富','省 ¥159/月'],['语雀','¥20 /人/月','阿里系知识库工具，个人和团队文档沉淀场景都很强','知识库|文档协作|团队空间','省 ¥157/月'],['百度文库','¥25 /月','海量文档和资料，覆盖学习与办公场景','文档资料|模板|AI 助手','省 ¥152/月']],
+      xsus:[['Surfshark','$12.95 /月','不限设备数，全家使用性价比很高','无限设备|隐私保护|CleanWeb|GPS 伪装','贵 ¥75.23/月'],['NordVPN','$12.99 /月','双重加密 + 威胁防护，安全性最强','双重加密|5500+节点|威胁防护|暗网监控','贵 ¥75.50/月'],['Nexitally','¥99 /月','稳定的网络代理工具，节点覆盖高','高速节点|多设备连接|稳定连接','贵 ¥87/月']],
+      bilibili:[['咪咕视频','18/月','体育赛事版权最全，中超英超独家直播','体育赛事|中超英超|4K HDR|移动权益联动',''],['芒果TV','22/月','湖南卫视综艺独播，国产综艺看这里就够了','湖南卫视独播|综艺王牌|自制剧|性价比高',''],['爱奇艺','25/月','热播剧综首选，4K 杜比视听体验好','热播剧综|4K 杜比|奇异果TV|自制综艺',''],['优酷','25/月','阿里影业资源丰富，港剧经典库存大','阿里影业资源|港剧经典|优酷自制|酷喵TV',''],['腾讯视频','25/月','视频会员服务','影视剧|综艺|动漫','']],
+      apple:[['SoundCloud Go+','$9.99 /月','独立音乐和 DJ 混音内容最丰富','独立音乐人|混音/DJ内容|离线收听|社区互动','贵 ¥60.29/月'],['Tidal','$10.99 /月','HiFi 发烧友首选，杜比全景声音质顶级','HiFi无损音质|杜比全景声|独家首发|艺术家直播','贵 ¥67.03/月'],['Deezer','$10.99 /月','全球曲库 + 无损 FLAC，Flow 推荐很懂你','全球曲库|无损 FLAC|歌词同步|Flow 推荐','贵 ¥67.03/月'],['Spotify','$11.99 /月','全球最大曲库融合顶级个性化推荐算法','全球最大曲库|个性化推荐|播客整合','贵 ¥73.76/月']]
+    };
+
+    const statRows = [
+      {name:'ChatGPT',category:'AI',paid:12069,monthly:60.35,values:[0,0,0,0,0,0,12069,0,6035,6035,6035,6034]},
+      {name:'Antigravity',category:'AI',paid:1600,monthly:1.33,values:[0,0,0,0,0,1600,0,0,0,0,0,0]},
+      {name:'Apple Music',category:'影音',paid:4200,monthly:7,values:[0,0,700,700,700,700,700,700,700,700,700,700]},
+      {name:'腾讯视频',category:'影音',paid:0,monthly:16.67,values:[0,0,0,0,0,0,0,0,0,20000,0,0]},
+      {name:'WPS 会员',category:'云服务',paid:17700,monthly:4.92,values:[0,0,0,0,0,0,17700,0,0,0,0,0]},
+      {name:'XSUS',category:'其他',paid:9600,monthly:12,values:Array(12).fill(1200)}
+    ];
+
+    const brandIcons = {
+      'FlowUs 息流':'flowus','腾讯文档':'docs','语雀':'yuque','百度文库':'baidu','Surfshark':'surfshark','NordVPN':'nordvpn','Nexitally':'nexitally','咪咕视频':'migu','芒果TV':'mango','爱奇艺':'iqiyi','优酷':'youku','SoundCloud Go+':'soundcloud','Tidal':'tidal','Deezer':'deezer','Spotify':'spotify','Telegram Premium':'telegram',
+      'Kimi':'kimi','文心一言':'baidu','通义千问':'qwen','豆包':'doubao','智谱清言':'zhipu','讯飞星火':'spark','海螺AI':'hailuo','天工AI':'tiangong','腾讯元宝':'yuanbao','DeepSeek':'deepseek','Trae':'trae','360智脑':'360','百川智能':'baichuan','CodeGeeX':'codegeex','阶跃星辰':'stepfun','可灵AI':'kling','即梦AI':'jimeng','Vidu':'vidu'
+    };
+
+    const allRecordingIcons = [
+      { id: 'chatgpt', name: 'ChatGPT', cat: 'AI' },
+      { id: 'deepseek', name: 'DeepSeek', cat: 'AI' },
+      { id: 'kimi', name: 'Kimi', cat: 'AI' },
+      { id: 'qwen', name: '通义千问', cat: 'AI' },
+      { id: 'doubao', name: '豆包', cat: 'AI' },
+      { id: 'trae', name: 'Trae', cat: 'AI' },
+      { id: 'spark', name: '讯飞星火', cat: 'AI' },
+      { id: 'zhipu', name: '智谱清言', cat: 'AI' },
+      { id: 'anti', name: 'Antigravity', cat: 'AI' },
+      { id: 'hailuo', name: '海螺AI', cat: 'AI' },
+      { id: 'tiangong', name: '天工AI', cat: 'AI' },
+      { id: 'yuanbao', name: '腾讯元宝', cat: 'AI' },
+      { id: 'baichuan', name: '百川智能', cat: 'AI' },
+      { id: 'codegeex', name: 'CodeGeeX', cat: 'AI' },
+      { id: 'stepfun', name: '阶跃星辰', cat: 'AI' },
+      { id: 'kling', name: '可灵AI', cat: 'AI' },
+      { id: 'jimeng', name: '即梦AI', cat: 'AI' },
+      { id: 'vidu', name: 'Vidu', cat: 'AI' },
+      { id: '360', name: '360智脑', cat: 'AI' },
+      { id: 'apple', name: 'Apple Music', cat: '影音' },
+      { id: 'bilibili', name: 'Bilibili', cat: '影音' },
+      { id: 'spotify', name: 'Spotify', cat: '影音' },
+      { id: 'tencent', name: '腾讯视频', cat: '影音' },
+      { id: 'iqiyi', name: '爱奇艺', cat: '影音' },
+      { id: 'youku', name: '优酷', cat: '影音' },
+      { id: 'mango', name: '芒果TV', cat: '影音' },
+      { id: 'migu', name: '咪咕视频', cat: '影音' },
+      { id: 'tidal', name: 'Tidal', cat: '影音' },
+      { id: 'deezer', name: 'Deezer', cat: '影音' },
+      { id: 'soundcloud', name: 'SoundCloud', cat: '影音' },
+      { id: 'wps', name: 'WPS', cat: '工具效率' },
+      { id: 'docs', name: '腾讯文档', cat: '工具效率' },
+      { id: 'flowus', name: 'FlowUs 息流', cat: '工具效率' },
+      { id: 'yuque', name: '语雀', cat: '工具效率' },
+      { id: 'baidu', name: '百度文库', cat: '工具效率' },
+      { id: 'surfshark', name: 'Surfshark', cat: '工具效率' },
+      { id: 'nordvpn', name: 'NordVPN', cat: '工具效率' },
+      { id: 'nexitally', name: 'Nexitally', cat: '工具效率' },
+      { id: 'telegram', name: 'Telegram', cat: '社交' },
+      { id: 'xsus', name: 'XSUS', cat: '其他' }
+    ];
+
+
+    // 算法辅助函数
+    function money(cents) { return '¥' + (cents / 100).toFixed(2); }
+    function escapeHtml(value) { return String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    function dateString(date) { return date.toISOString().slice(0,10); }
+    function validDate(value) { const date = new Date(value + 'T00:00:00Z'); return /^\d{4}-\d{2}-\d{2}$/.test(value) && Number.isFinite(+date) && dateString(date) === value; }
+    function addMonths(value, count) {
+      const date = new Date(value + 'T00:00:00Z'), day = date.getUTCDate();
+      date.setUTCDate(1); date.setUTCMonth(date.getUTCMonth() + Number(count));
+      date.setUTCDate(Math.min(day, new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth()+1,0)).getUTCDate()));
+      return dateString(date);
+    }
+    function monthEnd(month) { const [year,n] = month.split('-').map(Number); return dateString(new Date(Date.UTC(year,n,0))); }
+    function cycleDate(month, start) { return month + '-' + String(Math.min(Number(start.slice(-2)),Number(monthEnd(month).slice(-2)))).padStart(2,'0'); }
+    function amountInput(value) { return value.trim() !== '' && Number.isFinite(Number(value)) && Number(value) >= 0 && Number(value) <= 99999999; }
+    function rowsFor(year, category='全部') {
+      const rows = year === 2025 ? [{name:'腾讯视频',category:'影音',paid:20000,monthly:16.67,values:[0,0,0,0,0,0,0,0,0,20000,0,0]}] : statRows;
+      return rows.filter(row => category === '全部' || row.category === category);
+    }
+    function summarize(year, category='全部', month=null) {
+      return rowsFor(year,category).map(row => ({...row,amount: month === null ? row.values.reduce((a,b)=>a+b,0) : row.values[month-1]})).filter(row=>row.amount>0);
+    }
+    const fmtDate = value => value.replaceAll('-','.');
+    const currencySymbol = code => (currencyNames[code] || '$').split(' ')[0];
+
+    // 初始化 subscriptions 内部字段
+    Object.entries(subscriptions).forEach(([id,item],index) => {
+      item.id = id;
+      item.order = index;
+      item.amount = Number(item.price.match(/[\d.]+/)[0]);
+      item.currency = item.price.slice(-3);
+      item.months = id==='wps'?36:id==='anti'||id==='tencent'?12:1;
+      item.icon = id==='claude' ? null : id;
+    });
+
+    const iconHtml = item => item.iconSvg || (item.icon ? '<img src="assets/recording/'+escapeHtml(item.icon)+'.png" alt="">' : '<span>'+escapeHtml(item.logo || item.name.slice(0,1))+'</span>');
+
+    // DOM 选择器与状态管理
+    const $ = selector => document.querySelector(selector);
+    const $$ = selector => [...document.querySelectorAll(selector)];
+
+    let currentId = 'claude';
+    let currentNav = 'overview';
+    let overviewMode = 0;
+    let masterFilterCat = '全部';
+    let masterSortMode = '新添加排在上方';
+    let isCompact = false;
+    let hideExpired = false;
+    let displayCurrency = 'CNY';
+    let rates = { CNY: 1, USD: 6.7829, JPY: 0.0422, EUR: 7.8267, GBP: 9.1278, HKD: 0.8650 };
+    
+    let selectedYear = 2026;
+    let statCategory = '全部';
+    let statViewMode = 'trend';
+    let ratioMonth = 9;
+    
+    let altTargetId = 'wps';
+    let libCategory = '全部';
+
+    let addDraft = {};
+    let updateDraft = {};
+    let activeColorTarget = 'detail';
+    let activeIconTarget = 'detail';
+    let toastTimer = null;
+    let appTheme = 'dark';
+
+    // 主题切换函数
+    function applyTheme(theme, notify = false) {
+      appTheme = theme;
+      const isSystemLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+      const isLight = theme === 'light' || (theme === 'system' && isSystemLight);
+      
+      document.body.classList.toggle('theme-light', isLight);
+
+      $$('#theme-mode-selector .seg-pill-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.themeMode === theme);
+      });
+
+      const sunIcon = $('#theme-icon-sun');
+      const moonIcon = $('#theme-icon-moon');
+      if (sunIcon && moonIcon) {
+        sunIcon.hidden = !isLight;
+        moonIcon.hidden = isLight;
+      }
+
+      if (currentNav === 'analytics') renderAnalytics();
+      if (notify) {
+        showToast(`已切换外观模式：${theme === 'dark' ? '深色模式' : theme === 'light' ? '浅色模式' : '跟随系统'}`);
+      }
+    }
+
+    // Toast
+    function showToast(message) {
+      clearTimeout(toastTimer);
+      $('#toast-text-content').textContent = message;
+      $('#desktop-toast').classList.add('show');
+      toastTimer = setTimeout(() => $('#desktop-toast').classList.remove('show'), 2400);
+    }
+
+    // 模态与抽屉管理
+    function openModal(id) {
+      $('#' + id).classList.add('open');
+    }
+    function closeModal(id) {
+      $('#' + id).classList.remove('open');
+    }
+    function closeAllOverlays() {
+      $$('.modal-overlay, .drawer-overlay').forEach(el => el.classList.remove('open'));
+    }
+
+    // 导航视图切换
+    function switchNav(navKey) {
+      currentNav = navKey;
+      $$('.nav-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.nav === navKey));
+      $$('.view-pane').forEach(pane => pane.classList.toggle('active', pane.id === 'view-' + navKey));
+      if (navKey === 'analytics') renderAnalytics();
+      if (navKey === 'alternatives') renderAlternatives();
+      if (navKey === 'library') renderLibrary();
+    }
+
+    // ==========================================
+    // 1. 订阅总览 (Master-Detail) 渲染
+    // ==========================================
+    function renderOverviewMaster() {
+      const items = Object.values(subscriptions);
+      $('#nav-badge-count').textContent = items.length;
+      $('#statusbar-subs-summary span').textContent = '有效订阅：' + items.length + ' 项';
+
+      // 概览大卡片计算
+      const amounts = [
+        items.reduce((sum, item) => sum + (item.stopped ? 0 : Number(item.monthly.slice(1)) || 0), 0),
+        969.08 + (subscriptions.claude ? 606.22 : 0),
+        451.69 + (subscriptions.claude ? 134.71 : 0)
+      ];
+      $('#overview-card-amount').textContent = '¥' + amounts[overviewMode].toFixed(2);
+      $('#overview-card-label').textContent = ['概览 · 预估月均成本', '概览 · 预计年支出', '概览 · 今年已支出'][overviewMode];
+      $('#overview-card-sub').textContent = overviewMode === 0 ? '当前生效 ' + items.length + ' 项' : overviewMode === 1 ? '本年预计支出 31 笔' : '本年已支出 18 笔';
+
+      // 过滤与排序
+      let filtered = items.filter(item => {
+        if (masterFilterCat !== '全部' && item.category !== masterFilterCat) return false;
+        if (hideExpired && item.stopped) return false;
+        return true;
+      });
+
+      const searchQ = $('#global-search-input').value.trim().toLowerCase();
+      if (searchQ) {
+        filtered = filtered.filter(item => item.name.toLowerCase().includes(searchQ) || item.category.toLowerCase().includes(searchQ));
+      }
+
+      // Master-Detail 当前选中项联动纠偏
+      if (filtered.length > 0) {
+        if (!filtered.some(item => item.id === currentId)) {
+          currentId = filtered[0].id;
+        }
+      } else {
+        currentId = null;
+      }
+
+      if (masterSortMode === '新添加排在下方') {
+        filtered.sort((a, b) => a.order - b.order);
+      } else if (masterSortMode === '即将到期排在上方') {
+        filtered.sort((a, b) => a.next.localeCompare(b.next));
+      } else {
+        filtered.sort((a, b) => b.order - a.order);
+      }
+
+      // 渲染列表
+      const listEl = $('#master-subscription-list');
+      listEl.innerHTML = filtered.map(item => `
+        <div class="master-item ${item.id === currentId ? 'active' : ''} ${isCompact ? 'compact' : ''}" data-id="${item.id}" role="option" aria-selected="${item.id === currentId}">
+          <div class="item-logo-box" style="background:${item.color}22;border:1px solid ${item.color}44;">
+            ${iconHtml(item)}
+          </div>
+          <div class="item-main">
+            <div class="item-title-row">
+              <span>${escapeHtml(item.name)}</span>
+              ${item.promo ? '<span class="tag-badge">优惠中</span>' : ''}
+              ${item.manual ? '<span class="tag-badge manual">手动</span>' : ''}
+              ${item.stopped ? '<span class="tag-badge stopped">已停止</span>' : ''}
+            </div>
+            <div class="item-meta-row">${escapeHtml(item.category)} · ${escapeHtml(item.start)} 起</div>
+          </div>
+          <div class="item-price-col">
+            <div class="item-price-main">${escapeHtml(item.price)}</div>
+            <div class="item-due-text">${escapeHtml(item.nextLabel)}</div>
+          </div>
+        </div>
+      `).join('') || '<div style="padding:40px 20px;text-align:center;color:var(--text-faint);font-size:12px;">无匹配的订阅项</div>';
+
+      renderOverviewDetail();
+    }
+
+    function renderOverviewDetail() {
+      const emptyPane = $('#detail-empty-pane');
+      const workPane = $('#detail-workspace-pane');
+      const item = currentId ? subscriptions[currentId] : null;
+
+      if (!item) {
+        if (emptyPane) emptyPane.hidden = false;
+        if (workPane) workPane.hidden = true;
+        return;
+      }
+      if (emptyPane) emptyPane.hidden = true;
+      if (workPane) workPane.hidden = false;
+
+      $('#detail-item-name').textContent = item.name;
+      $('#detail-item-price').textContent = item.price;
+      $('#detail-item-cycle').textContent = item.cycle;
+      $('#detail-item-start').textContent = item.start;
+      $('#btn-detail-category').textContent = item.category + ' 分类 ⌄';
+
+      $('#btn-detail-logo').innerHTML = iconHtml(item);
+      $('#detail-color-indicator').style.background = item.color;
+      $('#detail-color-text').textContent = item.color;
+      $('#detail-hero-box').style.background = `linear-gradient(135deg, ${item.color}24 0%, rgba(105, 87, 222, 0.08) 100%), var(--bg-surface)`;
+
+      $('#detail-label-next').textContent = item.nextLabel;
+      $('#detail-val-next').textContent = item.next;
+      $('#detail-val-monthly').textContent = item.monthly;
+      $('#detail-val-total').textContent = item.total;
+      $('#detail-label-yearly').textContent = item.manual ? '本年成本（摊销）' : '本年消费（预计）';
+      $('#detail-val-yearly').textContent = item.yearly;
+
+      const notifySwitch = $('#switch-detail-notify');
+      notifySwitch.classList.toggle('on', !!item.notify);
+
+      // 时间线
+      const events = [[item.start, '开始订阅', item.note, '']];
+      if (item.future) {
+        events.push(...item.future);
+      } else {
+        events.push([item.next, item.manual ? '订阅到期' : '下次扣费', item.note, 'future']);
+      }
+      if (item.stopped) {
+        events.push([fmtDate(item.stopped), '停止自动续费', '到期后不再续期', 'danger']);
+      }
+
+      $('#detail-timeline-flow').innerHTML = events.map(([date, title, note, kind], idx) => `
+        <div class="timeline-node">
+          <i class="timeline-point ${kind || ''}"></i>
+          <div class="timeline-body">
+            <div class="timeline-date-text">${escapeHtml(date)}</div>
+            <div class="timeline-event-name">${escapeHtml(title)} ${idx === 0 && item.promo ? '<span class="tag-badge">优惠中</span>' : ''}</div>
+          </div>
+          <div class="timeline-detail-note">${escapeHtml(note)}</div>
+        </div>
+      `).join('');
+
+      // 操作按钮
+      const actContainer = $('#detail-action-buttons');
+      if (item.stopped) {
+        actContainer.innerHTML = '<button class="btn-action-primary" id="btn-cancel-stop">取消停止状态</button>';
+      } else if (item.manual) {
+        actContainer.innerHTML = '<button class="btn-action-primary" id="btn-open-renew">添加续费记录</button>';
+      } else {
+        actContainer.innerHTML = `
+          <button class="btn-action-primary" id="btn-open-update">订阅更新</button>
+          <button class="btn-action-secondary" id="btn-open-stop">停止订阅</button>
+        `;
+      }
+    }
+
+    // ==========================================
+    // 2. 统计看板 (Analytics) 渲染
+    // ==========================================
+    function chartSvg(values, annual=false) {
+      const max = Math.max(100, ...values);
+      const ceiling = Math.ceil(max / (max > 500 ? 200 : 50)) * (max > 500 ? 200 : 50);
+      const x = i => annual ? 140 + i * 220 : 48 + i * 42;
+      const y = value => 184 - value / ceiling * 148;
+      
+      let svg = `<svg class="plot-chart" viewBox="0 0 ${annual ? 500 : 560} 214" role="img">`;
+      for (let i = 0; i <= 4; i++) {
+        const val = ceiling * i / 4;
+        const py = y(val);
+        svg += `<line class="grid-line" x1="40" x2="${annual ? 480 : 540}" y1="${py}" y2="${py}"/>`;
+        svg += `<text x="34" y="${py + 3}" text-anchor="end">¥${Math.round(val)}</text>`;
+      }
+      if (!annual) {
+        svg += `<polyline fill="none" stroke="var(--brand-primary)" stroke-width="2.5" points="${values.map((v,i) => x(i) + ',' + y(v)).join(' ')}"/>`;
+      }
+      values.forEach((v, i) => {
+        svg += `<g ${!annual ? `role="button" tabindex="0" data-chart-month="${i+1}" aria-label="${i+1}月支出 ${v.toFixed(2)}元"` : ''}>`;
+        svg += `<title>${(annual ? 2025+i : (i+1)+'月')}: ${v.toFixed(2)} 元</title>`;
+        if (annual) {
+          svg += `<rect x="${x(i)-30}" y="${y(v)}" width="60" height="${184-y(v)}" rx="4" fill="var(--brand-primary)"/>`;
+          svg += `<text x="${x(i)}" y="${y(v)-10}" text-anchor="middle" fill="#fff" font-weight="600">¥${Math.round(v)}</text>`;
+          svg += `<text x="${x(i)}" y="204" text-anchor="middle">${2025+i}年</text>`;
+        } else {
+          svg += `<line x1="${x(i)}" x2="${x(i)}" y1="184" y2="${y(v)}" stroke="rgba(255,255,255,0.15)" stroke-width="12"/>`;
+          svg += `<circle cx="${x(i)}" cy="${y(v)}" r="4.5" fill="var(--brand-primary)" stroke="#fff" stroke-width="1.5"/>`;
+          svg += `<text x="${x(i)}" y="204" text-anchor="middle">${i+1}月</text>`;
+        }
+        svg += `</g>`;
+      });
+      svg += `</svg>`;
+      return svg;
+    }
+
+    function ratioParts(month=null) {
+      const rows = summarize(selectedYear, '全部', month);
+      const total = rows.reduce((s,r) => s + r.amount, 0);
+      const grouped = Object.keys(categoryColors).map(cat => ({
+        category: cat,
+        amount: rows.filter(r => r.category === cat).reduce((s,r) => s + r.amount, 0),
+        count: rows.filter(r => r.category === cat).length
+      })).filter(r => r.amount > 0).sort((a,b) => b.amount - a.amount);
+
+      let offset = 0;
+      const gradient = grouped.map(row => {
+        const from = offset;
+        offset += row.amount / total * 100;
+        return (categoryColors[row.category] || '#888') + ' ' + from + '% ' + offset + '%';
+      }).join(',');
+
+      const legend = grouped.map(row => `
+        <div class="legend-data-row">
+          <i style="background:${categoryColors[row.category] || '#888'}"></i>
+          <span>${escapeHtml(row.category)}</span>
+          <span style="color:var(--text-muted)">${row.count}项</span>
+          <span style="color:var(--text-muted)">${(row.amount/total*100).toFixed(1)}%</span>
+          <strong>${money(row.amount)}</strong>
+        </div>
+      `).join('');
+
+      return { total, gradient, legend };
+    }
+
+    function renderAnalytics() {
+      const rows = rowsFor(selectedYear, statCategory);
+      const summaries = summarize(selectedYear, statCategory);
+      const total = summaries.reduce((sum, row) => sum + row.amount, 0);
+      const paid = rows.reduce((sum, row) => sum + row.paid, 0);
+
+      // KPI 卡片
+      const kpiRow = $('#stat-kpi-row');
+      if (selectedYear === 2026) {
+        kpiRow.innerHTML = `
+          <div class="kpi-card"><span>本年已支出</span><strong>${money(paid)}</strong><small>按今年实际已扣费记录</small></div>
+          <div class="kpi-card"><span>全年预计总支出</span><strong>${money(total)}</strong><small>含未来月份预测费用</small></div>
+          <div class="kpi-card"><span>月均平摊成本</span><strong>¥${(rows.reduce((s,r)=>s+r.monthly,0)).toFixed(2)}</strong><small>当前生效订阅折算</small></div>
+        `;
+      } else {
+        kpiRow.innerHTML = `
+          <div class="kpi-card"><span>2025年 实际总支出</span><strong>${money(total)}</strong><small>按全年实际记录统计</small></div>
+          <div class="kpi-card"><span>较上年变动</span><strong>—</strong><small>2024年无历史记录</small></div>
+          <div class="kpi-card"><span>活跃订阅</span><strong>1 项</strong><small>腾讯视频 (年付)</small></div>
+        `;
+      }
+
+      // 图表数据计算
+      const monthly = Array.from({length:12}, (_,i) => rows.reduce((sum,row) => sum + row.values[i], 0)/100);
+      const annual = [2025, 2026].map(y => summarize(y, statCategory).reduce((sum,row) => sum + row.amount, 0)/100);
+
+      $('#stat-annual-tag').textContent = '¥ · ' + (statCategory === '全部' ? '所有分类' : statCategory);
+      $('#stat-monthly-title').textContent = selectedYear + '年月度支出走势 (' + (statCategory === '全部' ? '所有分类' : statCategory) + ')';
+      
+      $('#chart-annual-svg-wrap').innerHTML = chartSvg(annual, true);
+      $('#chart-monthly-svg-wrap').innerHTML = chartSvg(monthly, false);
+
+      // Top 排行
+      $('#stat-top-title').textContent = selectedYear + '年 Top 订阅支出排行';
+      $('#stat-top-rank-list').innerHTML = summaries.sort((a,b) => b.amount - a.amount).map(row => `
+        <div class="top-rank-row">
+          <div class="top-rank-meta">
+            <span>${escapeHtml(row.name)} <small style="color:var(--text-muted)">(${row.category})</small></span>
+            <strong>${money(row.amount)} <small style="color:var(--text-muted)">${(row.amount/total*100).toFixed(1)}%</small></strong>
+          </div>
+          <div class="top-progress-bar">
+            <div class="top-progress-fill" style="width:${(row.amount/total*100)}%;background:${categoryColors[row.category]||'var(--brand-primary)'}"></div>
+          </div>
+        </div>
+      `).join('') || '<div style="color:var(--text-faint);font-size:12px;padding:12px 0;">暂无消费数据</div>';
+
+      // 占比视图
+      const annualRatio = ratioParts();
+      const monthlyRatio = ratioParts(ratioMonth);
+
+      $('#stat-ratio-annual-title').textContent = selectedYear + '年 年度分类占比';
+      $('#stat-ratio-annual-total').textContent = '年度总计 ' + money(annualRatio.total);
+      $('#donut-annual').style.background = annualRatio.total ? `conic-gradient(${annualRatio.gradient})` : '';
+      $('#donut-annual').classList.toggle('empty', !annualRatio.total);
+      $('#legend-annual').innerHTML = annualRatio.legend;
+
+      $('#stat-ratio-month-total').textContent = ratioMonth + '月总计 ' + money(monthlyRatio.total);
+      $('#donut-monthly').style.background = monthlyRatio.total ? `conic-gradient(${monthlyRatio.gradient})` : '';
+      $('#donut-monthly').classList.toggle('empty', !monthlyRatio.total);
+      $('#legend-monthly').innerHTML = monthlyRatio.legend;
+
+      // 月份选择 Chips
+      $('#ratio-month-selector').innerHTML = Array.from({length:12}, (_,i) => `
+        <button class="filter-chip ${i+1===ratioMonth ? 'active' : ''}" data-ratio-m="${i+1}">${i+1}月</button>
+      `).join('');
+    }
+
+    // ==========================================
+    // 3. 平替智选 (Alternatives) 渲染
+    // ==========================================
+    function renderAlternatives() {
+      const keys = ['wps','xsus','bilibili','apple','anti','tencent','chatgpt'].filter(k => subscriptions[k]);
+      $('#alt-target-subs').innerHTML = keys.map(k => `
+        <button class="alt-sub-pill ${k===altTargetId ? 'active' : ''}" data-alt-id="${k}">${escapeHtml(subscriptions[k].name)}</button>
+      `).join('');
+
+      $('#alt-section-title').textContent = `「${subscriptions[altTargetId]?.name || '订阅'}」的高性价比替代方案`;
+      const rows = altData[altTargetId];
+      $('#alt-matrix-container').innerHTML = rows ? rows.map(([name, price, desc, tags, save]) => `
+        <div class="alt-product-card" data-alt-name="${escapeHtml(name)}">
+          <div class="alt-top-row">
+            <div class="alt-logo-box">
+              ${brandIcons[name] ? `<img src="assets/recording/${brandIcons[name]}.png" alt="">` : `<span>${escapeHtml(name.slice(0,2))}</span>`}
+            </div>
+            <div class="alt-info">
+              <h4>${escapeHtml(name)}</h4>
+              <p>${escapeHtml(desc)}</p>
+              <div class="alt-tag-flow">
+                ${tags.split('|').map(t => `<span>${escapeHtml(t)}</span>`).join('')}
+              </div>
+            </div>
+          </div>
+          <div class="alt-bottom-row">
+            <span class="alt-pricing-text">${escapeHtml(price)}</span>
+            ${save ? `<span class="alt-diff-badge ${save.startsWith('贵') ? 'costlier' : ''}">${escapeHtml(save)}</span>` : ''}
+          </div>
+        </div>
+      `).join('') : '<div style="color:var(--text-faint);padding:30px 0;">该订阅暂无录屏平替数据</div>';
+    }
+
+    // ==========================================
+    // 4. 服务发现与库 (Service Library) 渲染
+    // ==========================================
+    function renderLibrary() {
+      $('#lib-category-chips').innerHTML = categories.map(cat => `
+        <button class="filter-chip ${cat===libCategory ? 'active' : ''}" data-lib-cat="${cat}">${cat}</button>
+      `).join('');
+
+      const searchQ = $('#lib-filter-input').value.trim().toLowerCase();
+      const list = library.filter(item => (libCategory === '全部' || item.category === libCategory) && item.name.toLowerCase().includes(searchQ));
+
+      $('#lib-service-matrix').innerHTML = list.map(item => {
+        const known = Object.values(subscriptions).find(s => s.name === item.name);
+        const iconSrc = known?.icon ? `assets/recording/${known.icon}.png` : brandIcons[item.name] ? `assets/recording/${brandIcons[item.name]}.png` : null;
+        return `
+          <div class="service-card-tile" data-lib-name="${escapeHtml(item.name)}">
+            <div class="tile-logo">
+              ${iconSrc ? `<img src="${iconSrc}" alt="">` : `<span>${escapeHtml(item.name.slice(0,1))}</span>`}
+            </div>
+            <div class="tile-name">${escapeHtml(item.name)}</div>
+          </div>
+        `;
+      }).join('') || '<div style="grid-column:1/-1;text-align:center;color:var(--text-faint);padding:60px;">未检索到相关服务，您可以点击右上角“自定义空白订阅”手动创建</div>';
+    }
+
+    // ==========================================
+    // 5. 新建 / 更新 / 停止 / 删除 业务动作
+    // ==========================================
+    function openAddDrawer(presetName = '') {
+      const template = library.find(item => item.name === presetName);
+      const known = Object.values(subscriptions).find(item => item.name === presetName);
+
+      addDraft = {
+        name: presetName === '自定义空白订阅' ? '' : presetName,
+        category: template?.category || known?.category || '其他',
+        currency: known?.currency || 'CNY',
+        price: known?.amount || 0,
+        cycleMonths: known?.months || 1,
+        manual: !!known?.manual,
+        color: known?.color || '#D97757',
+        icon: known?.icon || brandIcons[presetName] || null
+      };
+
+      $('#drawer-add-title').textContent = presetName ? `配置订阅 · ${presetName}` : '添加自定义订阅';
+      $('#drawer-add-name').value = addDraft.name;
+      $('#drawer-add-price').value = addDraft.price;
+      $('#drawer-add-currency').value = addDraft.currency;
+      $('#drawer-add-category').value = addDraft.category;
+      $('#drawer-add-cycle').value = String(addDraft.cycleMonths);
+      $('#drawer-add-duration').value = '12';
+      $('#drawer-add-start').value = '2026-09-01';
+      $('#drawer-add-memo').value = '';
+      $('#drawer-add-error').textContent = '';
+
+      $('#btn-renew-auto').classList.toggle('active', !addDraft.manual);
+      $('#btn-renew-manual').classList.toggle('active', addDraft.manual);
+      $('#row-add-cycle').hidden = addDraft.manual;
+      $('#row-add-duration').hidden = !addDraft.manual;
+
+      $('#drawer-add-color-dot').style.background = addDraft.color;
+      $('#drawer-add-color-text').textContent = addDraft.color;
+      $('#drawer-add-logo-btn').innerHTML = iconHtml(addDraft);
+
+      openModal('drawer-add');
+    }
+
+    function saveAddDraft() {
+      const name = $('#drawer-add-name').value.trim();
+      const price = $('#drawer-add-price').value;
+      const currency = $('#drawer-add-currency').value;
+      const category = $('#drawer-add-category').value;
+      const start = $('#drawer-add-start').value;
+      const duration = Number($('#drawer-add-duration').value);
+
+      if (!name || !amountInput(price) || !validDate(start)) {
+        $('#drawer-add-error').textContent = '请完整填写订阅名称、有效金额与开始时间。';
+        return;
+      }
+
+      const id = 'custom-' + Date.now();
+      const months = addDraft.manual ? duration : Number($('#drawer-add-cycle').value);
+      const converted = Number(price) * (rates[currency] || 1);
+      const next = addMonths(start, months);
+
+      subscriptions[id] = {
+        id,
+        name,
+        category,
+        color: addDraft.color,
+        icon: addDraft.icon,
+        amount: Number(price),
+        currency,
+        price: currencySymbol(currency) + price + ' ' + currency,
+        cycle: addDraft.manual ? '手动续费' : (cycleNames[months] || months + '个月') + ' · 自动扣费',
+        months,
+        manual: addDraft.manual,
+        start: fmtDate(start),
+        next: fmtDate(next),
+        nextLabel: (addDraft.manual ? '到期日' : '下次扣费日') + ' · ' + fmtDate(next),
+        monthly: '¥' + (converted / months).toFixed(2),
+        total: '¥' + converted.toFixed(2),
+        yearly: '¥' + converted.toFixed(2),
+        note: currencySymbol(currency) + price + ' · ' + months + '个月',
+        notify: false,
+        memo: $('#drawer-add-memo').value.trim(),
+        order: Object.keys(subscriptions).length
+      };
+
+      currentId = id;
+      closeModal('drawer-add');
+      switchNav('overview');
+      renderOverviewMaster();
+      showToast(`已成功添加订阅「${name}」并保存至本地状态`);
+    }
+
+    // 订阅更新与补差价升级
+    function openUpdateDialog() {
+      const item = subscriptions[currentId];
+      if (!item) return;
+
+      updateDraft = {
+        mode: 'next',
+        anchor: 'keep',
+        price: item.amount || 20,
+        currency: item.currency || 'USD',
+        months: item.months || 1
+      };
+
+      $('#update-current-price-text').textContent = item.price + ' · ' + item.cycle;
+      $('#update-new-price').value = (Number(item.amount) || 20) + (item.currency === 'CNY' ? 20 : 10);
+      $('#update-new-currency').value = updateDraft.currency;
+      $('#update-upgrade-date').value = '2026-09-01';
+      $('#update-diff-amount').value = (item.currency === 'CNY' ? 15 : 10);
+      $('#update-error-msg').textContent = '';
+
+      // 生成未来 12 个月候选项
+      const monthSelect = $('#update-effective-month');
+      monthSelect.innerHTML = Array.from({length:12}, (_,i) => {
+        const m = addMonths('2026-09-01', i + 1).slice(0,7);
+        return `<option value="${m}">${m.replace('-','年')}月</option>`;
+      }).join('');
+
+      renderUpdateModal();
+      openModal('modal-update');
+    }
+
+    function renderUpdateModal() {
+      const isNow = updateDraft.mode === 'now';
+      const item = subscriptions[currentId];
+      if (!item) return;
+
+      $('#btn-update-mode-next').classList.toggle('active', !isNow);
+      $('#btn-update-mode-now').classList.toggle('active', isNow);
+      $('#update-next-cycle-group').hidden = isNow;
+      $('#update-now-fields').hidden = !isNow;
+
+      $('#btn-anchor-keep').classList.toggle('active', updateDraft.anchor === 'keep');
+      $('#btn-anchor-reset').classList.toggle('active', updateDraft.anchor === 'reset');
+
+      const nextMonth = $('#update-effective-month').value || '2026-10';
+      const nextDate = cycleDate(nextMonth, item.start.replaceAll('.','-'));
+      $('#update-effective-hint').textContent = `预计首次按新价格扣费：${fmtDate(nextDate)}`;
+
+      const upDate = $('#update-upgrade-date').value || '2026-09-01';
+      const resetDate = fmtDate(addMonths(upDate, item.months || 1));
+      $('#update-anchor-hint').textContent = updateDraft.anchor === 'keep' 
+        ? `保持原扣费日：下次扣费仍为 ${item.next}`
+        : `升级日起重新计费：下次扣费顺延至 ${resetDate}`;
+    }
+
+    function confirmUpdate() {
+      const newPrice = $('#update-new-price').value;
+      if (!amountInput(newPrice)) {
+        $('#update-error-msg').textContent = '请输入有效的新价格。';
+        return;
+      }
+
+      const item = subscriptions[currentId];
+      const currency = $('#update-new-currency').value;
+      const isNow = updateDraft.mode === 'now';
+      const effDate = isNow ? $('#update-upgrade-date').value : cycleDate($('#update-effective-month').value, item.start.replaceAll('.','-'));
+
+      if (isNow && !validDate(effDate)) {
+        $('#update-error-msg').textContent = '请输入有效的升级日期。';
+        return;
+      }
+
+      const rate = rates[currency] || 1;
+      const converted = Number(newPrice) * rate;
+
+      if (isNow) {
+        const oldPriceText = item.price;
+        const diffAmount = $('#update-diff-amount').value || 0;
+        item.amount = Number(newPrice);
+        item.currency = currency;
+        item.price = currencySymbol(currency) + newPrice + ' ' + currency;
+        item.monthly = '¥' + (converted / (item.months || 1)).toFixed(2);
+        
+        if (updateDraft.anchor === 'reset') {
+          item.next = fmtDate(addMonths(effDate, item.months || 1));
+          item.nextLabel = (item.manual ? '到期日' : '下次扣费日') + ' · ' + item.next;
+        }
+
+        const note = `${oldPriceText} 升级为 ${item.price}（补差价 ${currencySymbol(currency)}${diffAmount}）`;
+        item.future = (item.future || []).filter(e => !(e[0] === fmtDate(effDate) && (e[1] === '套餐升级' || e[1] === '订阅更新')));
+        item.future.push([fmtDate(effDate), '套餐升级 · 立即生效', note, 'future']);
+        item.future.sort((a,b) => a[0].localeCompare(b[0]));
+
+        closeModal('modal-update');
+        renderOverviewMaster();
+        showToast('已立即生效套餐升级，当前方案、月均费与时间线已刷新');
+      } else {
+        const note = `${item.price} → ${currencySymbol(currency)}${newPrice} ${currency} · 下个账期起`;
+        item.future = (item.future || []).filter(e => !(e[0] === fmtDate(effDate) && e[1] === '订阅更新'));
+        item.future.push([fmtDate(effDate), '订阅更新', note, 'future']);
+        item.future.sort((a,b) => a[0].localeCompare(b[0]));
+
+        closeModal('modal-update');
+        renderOverviewMaster();
+        showToast(`已安排在 ${fmtDate(effDate)} 生效新价格`);
+      }
+    }
+
+    // 手动续费记录管理
+    function openRenewDialog() {
+      const item = subscriptions[currentId];
+      if (!item) return;
+
+      $('#renew-sub-name').textContent = item.name;
+      $('#renew-current-due').textContent = item.next;
+      $('#renew-input-price').value = item.amount || 177;
+      $('#renew-input-currency').value = item.currency || 'CNY';
+      $('#renew-input-months').value = String(item.months || 12);
+      $('#renew-input-date').value = '2026-09-01';
+      $('#renew-input-memo').value = '';
+      $('#renew-error-msg').textContent = '';
+
+      updateRenewPreview();
+      openModal('modal-renew');
+    }
+
+    function updateRenewPreview() {
+      const item = subscriptions[currentId];
+      if (!item) return;
+      const addM = Number($('#renew-input-months').value) || 12;
+      const baseDate = item.next ? item.next.replaceAll('.','-') : '2026-09-01';
+      const extended = addMonths(baseDate, addM);
+      $('#renew-preview-next').textContent = fmtDate(extended);
+    }
+
+    function confirmRenew() {
+      const item = subscriptions[currentId];
+      if (!item) return;
+
+      const price = $('#renew-input-price').value;
+      const currency = $('#renew-input-currency').value;
+      const addM = Number($('#renew-input-months').value) || 12;
+      const renewDate = $('#renew-input-date').value;
+      const memo = $('#renew-input-memo').value.trim();
+
+      if (!amountInput(price) || !validDate(renewDate)) {
+        $('#renew-error-msg').textContent = '请输入有效续费金额与日期。';
+        return;
+      }
+
+      const rate = rates[currency] || 1;
+      const addedCents = Math.round(Number(price) * rate * 100);
+
+      const baseDate = item.next ? item.next.replaceAll('.','-') : renewDate;
+      const newNext = addMonths(baseDate, addM);
+      item.next = fmtDate(newNext);
+      item.nextLabel = '到期日 · ' + item.next;
+
+      // 累加总支出
+      const currentTotalNum = Number(item.total.replace(/[^0-9.]/g, '')) || 0;
+      item.total = '¥' + (currentTotalNum + (addedCents / 100)).toFixed(2);
+
+      // 追加时间线事件
+      const note = memo ? `${currencySymbol(currency)}${price} · 延长 ${addM} 个月 (${memo})` : `${currencySymbol(currency)}${price} · 延长 ${addM} 个月`;
+      item.future = item.future || [];
+      item.future.push([fmtDate(renewDate), '手动续费入账', note, '']);
+      item.future.sort((a,b) => a[0].localeCompare(b[0]));
+
+      closeModal('modal-renew');
+      renderOverviewMaster();
+      showToast(`已为「${item.name}」添加续费记录，到期日顺延至 ${item.next}`);
+    }
+
+    // 分类变更弹窗
+    function openCategoryDialog() {
+      const item = subscriptions[currentId];
+      if (!item) return;
+
+      $('#category-selector-grid').innerHTML = categories.filter(c => c !== '全部').map(c => `
+        <button class="filter-chip ${c===item.category ? 'active' : ''}" data-set-cat="${c}" style="justify-content:center;">${c}</button>
+      `).join('');
+      openModal('modal-category');
+    }
+
+    function setItemCategory(cat) {
+      const item = subscriptions[currentId];
+      if (!item) return;
+      item.category = cat;
+      closeModal('modal-category');
+      renderOverviewMaster();
+      showToast(`已将「${item.name}」分类修改为「${cat}」`);
+    }
+
+    // 基准货币切换
+    // 汇率管理与折算规则操作
+    function openRatesDialog() {
+      $('#rate-input-usd').value = rates.USD.toFixed(4);
+      $('#rate-input-jpy').value = rates.JPY.toFixed(4);
+      $('#rate-input-eur').value = rates.EUR.toFixed(4);
+      $('#rate-input-gbp').value = rates.GBP.toFixed(4);
+      $('#rate-input-hkd').value = rates.HKD.toFixed(4);
+      openModal('modal-rates');
+    }
+
+    function fetchOnlineRates() {
+      const btn = $('#btn-fetch-online-rates');
+      btn.disabled = true;
+      btn.textContent = '⚡ 正在拉取...';
+      setTimeout(() => {
+        // 模拟联网从中国外汇交易中心/公开API获取最新牌价
+        $('#rate-input-usd').value = '6.7829';
+        $('#rate-input-jpy').value = '0.0422';
+        $('#rate-input-eur').value = '7.8267';
+        $('#rate-input-gbp').value = '9.1278';
+        $('#rate-input-hkd').value = '0.8650';
+        $('#rate-sync-status-text').textContent = '已联网同步官方最新牌价 · ' + new Date().toLocaleDateString();
+        btn.disabled = false;
+        btn.textContent = '⚡ 联网拉取最新牌价';
+        showToast('已成功联网获取最新外汇中间价牌价！');
+      }, 400);
+    }
+
+    function resetDefaultRates() {
+      $('#rate-input-usd').value = '6.7829';
+      $('#rate-input-jpy').value = '0.0422';
+      $('#rate-input-eur').value = '7.8267';
+      $('#rate-input-gbp').value = '9.1278';
+      $('#rate-input-hkd').value = '0.8650';
+      showToast('已恢复为官方默认基准牌价');
+    }
+
+    function saveCustomRates() {
+      const u = parseFloat($('#rate-input-usd').value);
+      const j = parseFloat($('#rate-input-jpy').value);
+      const e = parseFloat($('#rate-input-eur').value);
+      const g = parseFloat($('#rate-input-gbp').value);
+      const h = parseFloat($('#rate-input-hkd').value);
+      if (isNaN(u) || u <= 0 || isNaN(j) || j <= 0 || isNaN(e) || e <= 0 || isNaN(g) || g <= 0 || isNaN(h) || h <= 0) {
+        showToast('请输入有效的汇率数值（必须大于 0）');
+        return;
+      }
+      rates.USD = u;
+      rates.JPY = j;
+      rates.EUR = e;
+      rates.GBP = g;
+      rates.HKD = h;
+
+      // 实时重算受汇率影响的订阅项目
+      if (subscriptions.chatgpt) {
+        subscriptions.chatgpt.monthly = '¥' + (1430 * rates.JPY).toFixed(2);
+        subscriptions.chatgpt.total = '¥' + (2860 * rates.JPY).toFixed(2);
+        subscriptions.chatgpt.yearly = '¥' + (2860 * rates.JPY + 4 * 1430 * rates.JPY).toFixed(2);
+      }
+      if (subscriptions.claude) {
+        subscriptions.claude.monthly = '¥' + (20 * rates.USD).toFixed(2);
+      }
+
+      // 更新状态栏文案
+      const rateBar = $('#statusbar-rates');
+      if (rateBar) {
+        rateBar.querySelector('span').textContent = `当前汇率基准：1 USD ≈ ${rates.USD.toFixed(2)} CNY · 100 JPY ≈ ${(rates.JPY*100).toFixed(2)} CNY · 1 EUR ≈ ${rates.EUR.toFixed(2)} CNY ℹ`;
+      }
+
+      closeModal('modal-rates');
+      renderOverviewMaster();
+      if (currentNav === 'analytics') renderAnalytics();
+      showToast('汇率已成功保存！外币订阅与月均成本已即时按新汇率重算');
+    }
+
+    function openCurrencyDialog() {
+      $('#currency-options-list').innerHTML = Object.entries(currencyNames).map(([code, name]) => `
+        <button class="filter-chip ${code===displayCurrency ? 'active' : ''}" data-set-currency="${code}" style="width:100%;justify-content:space-between;padding:8px 12px;">
+          <span>${name}</span>
+          <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted)">${code}</span>
+        </button>
+      `).join('');
+      openModal('modal-currency');
+    }
+
+    function setDisplayCurrency(code) {
+      displayCurrency = code;
+      $('#btn-set-display-currency').textContent = (currencyNames[code] || code) + ' ⌄';
+      closeModal('modal-currency');
+      renderOverviewMaster();
+      showToast(`已将系统统计与卡片基准货币设为 ${code}`);
+    }
+
+    // 本地 SQLite 引擎状态说明
+    function openDbDialog() {
+      const items = Object.values(subscriptions);
+      let eventCount = 0;
+      items.forEach(i => { eventCount += 1 + (i.future ? i.future.length : 1); });
+      $('#db-stat-record-count').textContent = `${items.length} 项订阅 · ${eventCount} 条计费事件`;
+      openModal('modal-db');
+    }
+
+    function openStopDialog() {
+      const item = subscriptions[currentId];
+      if (!item) return;
+
+      const monthSelect = $('#stop-select-month');
+      monthSelect.innerHTML = Array.from({length:12}, (_,i) => {
+        const m = addMonths('2026-09-01', i).slice(0,7);
+        return `<option value="${m}">${m.replace('-','年')}月</option>`;
+      }).join('');
+
+      $('#stop-calc-expiry').textContent = fmtDate(monthEnd(monthSelect.value));
+      $('#stop-error-msg').textContent = '';
+      openModal('modal-stop');
+    }
+
+    function confirmStop() {
+      const month = $('#stop-select-month').value;
+      const expiry = monthEnd(month);
+      const item = subscriptions[currentId];
+
+      item.stopped = expiry;
+      closeModal('modal-stop');
+      renderOverviewMaster();
+      showToast('已为该订阅设置停止续费');
+    }
+
+    // ==========================================
+    // 6. 真实本地文件导入 / 导出 (Desktop Local-First)
+    // ==========================================
+    function exportJsonBackup() {
+      const backupData = {
+        schemaVersion: '1.0',
+        exportedAt: new Date().toISOString(),
+        device: 'Windows-Desktop',
+        subscriptions: subscriptions,
+        settings: {
+          displayCurrency: 'CNY',
+          overviewMode: overviewMode,
+          selectedYear: selectedYear
+        }
+      };
+
+      const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `DingXiaoYue_Backup_${dateString(new Date())}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('已将完整 JSON 数据备份下载到您的本地电脑');
+    }
+
+    function importJsonBackup(file) {
+      const reader = new FileReader();
+      reader.onload = e => {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          if (!parsed.subscriptions || typeof parsed.subscriptions !== 'object') {
+            showToast('导入失败：JSON 备份结构不匹配');
+            return;
+          }
+          Object.assign(subscriptions, parsed.subscriptions);
+          currentId = Object.keys(subscriptions)[0] || 'claude';
+          renderOverviewMaster();
+          showToast(`成功恢复 ${Object.keys(parsed.subscriptions).length} 项本地订阅数据！`);
+        } catch (err) {
+          showToast('导入失败：文件不是有效的 JSON');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function exportCsvReport() {
+      const headers = ['订阅名称', '分类', '价格', '付费方式', '下次扣费/到期', '预估月均', '累计消费', '起始时间'];
+      const rows = Object.values(subscriptions).map(item => [
+        `"${item.name}"`,
+        `"${item.category}"`,
+        `"${item.price}"`,
+        `"${item.cycle}"`,
+        `"${item.next}"`,
+        `"${item.monthly}"`,
+        `"${item.total}"`,
+        `"${item.start}"`
+      ]);
+      const csvContent = '\uFEFF' + [headers.join(','), ...rows.map(r => r.join(','))].join('\r\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `DingXiaoYue_Subscriptions_${dateString(new Date())}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('已导出 CSV 财务明细表');
+    }
+
+    // ==========================================
+    // 7. 事件委托与键盘监听
+    // ==========================================
+    document.addEventListener('click', event => {
+      const btn = event.target.closest('button, [data-nav], [data-alt-id], [data-lib-name], [data-id], .status-item, #sidebar-user-tile, [data-set-cat], [data-set-currency]');
+      if (!btn) return;
+
+      // 导航切换
+      if (btn.dataset.nav) {
+        switchNav(btn.dataset.nav);
+        return;
+      }
+
+      // 侧栏收起
+      if (btn.id === 'btn-toggle-sidebar') {
+        const sb = $('#sidebar');
+        sb.classList.toggle('collapsed');
+        btn.querySelector('span').textContent = sb.classList.contains('collapsed') ? '' : '收起导航';
+        return;
+      }
+
+      // 概览大卡片切换统计口径
+      if (btn.id === 'overview-hero-card') {
+        overviewMode = (overviewMode + 1) % 3;
+        renderOverviewMaster();
+        return;
+      }
+
+      // Master 列表选择项
+      if (btn.dataset.id && btn.classList.contains('master-item')) {
+        currentId = btn.dataset.id;
+        renderOverviewMaster();
+        return;
+      }
+
+      // 分类过滤
+      if (btn.dataset.category) {
+        masterFilterCat = btn.dataset.category;
+        $$('#master-category-chips .filter-chip').forEach(c => c.classList.toggle('active', c === btn));
+        renderOverviewMaster();
+        return;
+      }
+
+      // 紧凑模式
+      if (btn.id === 'btn-toggle-compact') {
+        isCompact = !isCompact;
+        btn.classList.toggle('active', isCompact);
+        renderOverviewMaster();
+        return;
+      }
+
+      // 快捷新建
+      if (btn.id === 'btn-quick-add' || btn.id === 'btn-custom-add-service') {
+        openAddDrawer('自定义空白订阅');
+        return;
+      }
+
+      // 主题切换
+      if (btn.dataset.themeMode) {
+        applyTheme(btn.dataset.themeMode, true);
+        return;
+      }
+      if (btn.id === 'btn-quick-theme') {
+        const next = document.body.classList.contains('theme-light') ? 'dark' : 'light';
+        applyTheme(next, true);
+        return;
+      }
+
+      // 服务库点击服务添加
+      if (btn.dataset.libName) {
+        openAddDrawer(btn.dataset.libName);
+        return;
+      }
+
+      // 模态关闭
+      if (btn.hasAttribute('data-close')) {
+        closeAllOverlays();
+        return;
+      }
+
+      // 详情操作
+      if (btn.id === 'btn-open-update') openUpdateDialog();
+      if (btn.id === 'btn-open-stop') openStopDialog();
+      if (btn.id === 'btn-open-renew') openRenewDialog();
+      if (btn.id === 'btn-confirm-renew') confirmRenew();
+      if (btn.id === 'btn-detail-category') openCategoryDialog();
+      if (btn.dataset.setCat) setItemCategory(btn.dataset.setCat);
+      if (btn.id === 'btn-set-display-currency') openCurrencyDialog();
+      if (btn.dataset.setCurrency) setDisplayCurrency(btn.dataset.setCurrency);
+      if (btn.id === 'btn-open-delete') openModal('modal-delete');
+      if (btn.id === 'btn-confirm-delete') {
+        delete subscriptions[currentId];
+        currentId = Object.keys(subscriptions)[0] || '';
+        closeModal('modal-delete');
+        renderOverviewMaster();
+        showToast('已从本地数据库中删除该订阅');
+      }
+      if (btn.id === 'btn-cancel-stop') {
+        delete subscriptions[currentId].stopped;
+        renderOverviewMaster();
+        showToast('已取消停止状态，恢复自动续费');
+      }
+
+      // 用户资料点击跳转至设置
+      if (btn.id === 'sidebar-user-tile') {
+        switchNav('settings');
+        return;
+      }
+
+      // 窗口三键模拟
+      if (btn.id === 'win-btn-min') {
+        showToast('已最小化窗口至系统托盘（订小阅后台常驻）');
+        return;
+      }
+      if (btn.id === 'win-btn-max') {
+        const isMax = document.body.classList.toggle('window-maximized');
+        btn.textContent = isMax ? '❐' : '□';
+        showToast(isMax ? '已全屏展开工作区' : '已还原标准窗口尺寸');
+        return;
+      }
+      if (btn.id === 'win-btn-close') {
+        showToast('已隐藏窗口并最小化到系统托盘。如需退出请在偏好设置中退出。');
+        return;
+      }
+
+      // 状态栏项点击交互
+      if (btn.id === 'statusbar-db') {
+        openDbDialog();
+        return;
+      }
+      if (btn.id === 'statusbar-queue') {
+        showToast('离线优先：本地变更队列已全部提交至 SQLite，无待同步项。');
+        return;
+      }
+      if (btn.id === 'statusbar-rates') {
+        openRatesDialog();
+        return;
+      }
+
+      // 空状态重置按钮
+      if (btn.id === 'btn-empty-clear') {
+        masterFilterCat = '全部';
+        $('#global-search-input').value = '';
+        $('#master-category-chips .filter-chip').forEach(c => c.classList.toggle('active', c.dataset.category === '全部'));
+        renderOverviewMaster();
+        return;
+      }
+
+      // 详情卡片颜色与图标
+      if (btn.id === 'btn-detail-color' || btn.id === 'btn-drawer-add-color') {
+        activeColorTarget = btn.id === 'btn-detail-color' ? 'detail' : 'add';
+        $('#color-swatch-grid').innerHTML = ['#D97757','#D4252B','#10A37F','#2AABEE','#695DFF','#FF696C','#FFAE35','#AD3490','#17162F','#999999','#3479DC','#50A789'].map(c => `
+          <button class="color-swatch-btn" style="background:${c}" data-color="${c}"></button>
+        `).join('');
+        openModal('modal-colors');
+      }
+      if (btn.dataset.color) {
+        const color = btn.dataset.color;
+        if (activeColorTarget === 'detail') {
+          subscriptions[currentId].color = color;
+          renderOverviewMaster();
+        } else {
+          addDraft.color = color;
+          $('#drawer-add-color-dot').style.background = color;
+          $('#drawer-add-color-text').textContent = color;
+        }
+        closeModal('modal-colors');
+      }
+      if (btn.id === 'btn-confirm-color') {
+        const color = $('#custom-hex-color').value.toUpperCase();
+        if (activeColorTarget === 'detail') {
+          subscriptions[currentId].color = color;
+          renderOverviewMaster();
+        } else {
+          addDraft.color = color;
+          $('#drawer-add-color-dot').style.background = color;
+          $('#drawer-add-color-text').textContent = color;
+        }
+        closeModal('modal-colors');
+      }
+
+      // 图标选择
+      if (btn.id === 'btn-detail-logo' || btn.id === 'drawer-add-logo-btn') {
+        activeIconTarget = btn.id === 'btn-detail-logo' ? 'detail' : 'add';
+        renderIconPicker();
+        openModal('modal-icons');
+      }
+      if (btn.dataset.iconName) {
+        const icon = btn.dataset.iconName;
+        if (activeIconTarget === 'detail') {
+          subscriptions[currentId].icon = icon;
+          renderOverviewMaster();
+        } else {
+          addDraft.icon = icon;
+          $('#drawer-add-logo-btn').innerHTML = iconHtml(addDraft);
+        }
+        closeModal('modal-icons');
+      }
+
+      // 统计视图切换与交互
+      if (btn.dataset.year) {
+        selectedYear = Number(btn.dataset.year);
+        $$('#stat-year-selector .seg-pill-btn').forEach(b => b.classList.toggle('active', b === btn));
+        renderAnalytics();
+      }
+      if (btn.dataset.view) {
+        statViewMode = btn.dataset.view;
+        $$('#stat-view-selector .seg-pill-btn').forEach(b => b.classList.toggle('active', b === btn));
+        $('#analytics-trend-container').hidden = statViewMode !== 'trend';
+        $('#analytics-ratio-container').hidden = statViewMode !== 'ratio';
+      }
+      if (btn.dataset.statCat) {
+        statCategory = btn.dataset.statCat;
+        $$('#stat-category-chips .filter-chip').forEach(c => c.classList.toggle('active', c === btn));
+        renderAnalytics();
+      }
+      if (btn.dataset.ratioM) {
+        ratioMonth = Number(btn.dataset.ratioM);
+        $$('#ratio-month-selector .filter-chip').forEach(c => c.classList.toggle('active', c === btn));
+        renderAnalytics();
+      }
+
+      // 平替选择
+      if (btn.dataset.altId) {
+        altTargetId = btn.dataset.altId;
+        renderAlternatives();
+      }
+
+      // 服务库分类
+      if (btn.dataset.libCat) {
+        libCategory = btn.dataset.libCat;
+        renderLibrary();
+      }
+
+      // 抽屉与模态确认保存
+      if (btn.id === 'btn-save-subscription') saveAddDraft();
+      if (btn.id === 'btn-confirm-update') confirmUpdate();
+      if (btn.id === 'btn-confirm-stop') confirmStop();
+
+      // 订阅更新生效模式与扣费锚点切换
+      if (btn.dataset.updateMode) {
+        updateDraft.mode = btn.dataset.updateMode;
+        renderUpdateModal();
+        return;
+      }
+      if (btn.dataset.anchor) {
+        updateDraft.anchor = btn.dataset.anchor;
+        renderUpdateModal();
+        return;
+      }
+
+      // 新建抽屉单选方式
+      if (btn.id === 'btn-renew-auto') {
+        addDraft.manual = false;
+        $('#btn-renew-auto').classList.add('active');
+        $('#btn-renew-manual').classList.remove('active');
+        $('#row-add-cycle').hidden = false;
+        $('#row-add-duration').hidden = true;
+      }
+      if (btn.id === 'btn-renew-manual') {
+        addDraft.manual = true;
+        $('#btn-renew-manual').classList.add('active');
+        $('#btn-renew-auto').classList.remove('active');
+        $('#row-add-cycle').hidden = true;
+        $('#row-add-duration').hidden = false;
+      }
+
+      // 备份导出 / 恢复
+      if (btn.id === 'btn-export-json') exportJsonBackup();
+      if (btn.id === 'btn-import-json') $('#hidden-file-input').click();
+      if (btn.id === 'btn-export-csv') exportCsvReport();
+
+      // 汇率更新与说明弹窗
+      if (btn.id === 'btn-open-rates-dialog' || btn.id === 'statusbar-rates' || btn.id === 'row-setting-rates') {
+        openRatesDialog();
+        return;
+      }
+      if (btn.id === 'btn-fetch-online-rates') {
+        fetchOnlineRates();
+        return;
+      }
+      if (btn.id === 'btn-reset-default-rates') {
+        resetDefaultRates();
+        return;
+      }
+      if (btn.id === 'btn-save-rates') {
+        saveCustomRates();
+        return;
+      }
+
+      // 其他弹窗
+      if (btn.id === 'btn-open-logic-dialog') openModal('modal-logic');
+
+      // 开关切换 (Switch)
+      if (btn.classList.contains('win-switch')) {
+        btn.classList.toggle('on');
+        if (btn.id === 'switch-detail-notify') {
+          if (subscriptions[currentId]) subscriptions[currentId].notify = btn.classList.contains('on');
+          showToast(btn.classList.contains('on') ? '已开启该订阅的 Windows 到期提醒' : '已关闭到期提醒');
+        } else if (btn.id === 'switch-setting-expired') {
+          hideExpired = !btn.classList.contains('on');
+          renderOverviewMaster();
+          showToast(btn.classList.contains('on') ? '已设置为在列表中显示已终止/到期的历史订阅' : '已隐藏已终止订阅');
+        } else if (btn.id === 'switch-setting-toast') {
+          showToast(btn.classList.contains('on') ? '已授权 Windows 操作中心发送系统 Toast 通知' : '已禁用 Windows 桌面通知');
+        }
+      }
+    });
+
+    function renderIconPicker() {
+      const q = ($('#icon-search-input').value || '').trim().toLowerCase();
+      const list = allRecordingIcons.filter(item => {
+        if (!q) return true;
+        return item.id.includes(q) || item.name.toLowerCase().includes(q) || (item.cat && item.cat.includes(q));
+      });
+
+      $('#icon-picker-grid').innerHTML = list.map(icon => `
+        <button class="icon-tile-btn" data-icon-name="${icon.id}" title="${escapeHtml(icon.name)} (${icon.id})">
+          <img src="assets/recording/${icon.id}.png" alt="${escapeHtml(icon.name)}">
+        </button>
+      `).join('') || '<div style="grid-column:1/-1;text-align:center;color:var(--text-faint);padding:30px;">未找到匹配图标，可直接输入自定义文字图标</div>';
+    }
+
+    // 键盘快捷键监听
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape') {
+        closeAllOverlays();
+        return;
+      }
+
+      // Ctrl + N: 新建订阅
+      if (event.ctrlKey && (event.key === 'n' || event.key === 'N')) {
+        event.preventDefault();
+        openAddDrawer('自定义空白订阅');
+        return;
+      }
+
+      // Ctrl + F: 聚焦搜索
+      if (event.ctrlKey && (event.key === 'f' || event.key === 'F')) {
+        event.preventDefault();
+        $('#global-search-input').focus();
+        return;
+      }
+
+      // Ctrl + 1..5: 快速视图切换
+      if (event.ctrlKey && ['1','2','3','4','5'].includes(event.key)) {
+        event.preventDefault();
+        const views = ['overview', 'analytics', 'alternatives', 'library', 'settings'];
+        switchNav(views[Number(event.key) - 1]);
+        return;
+      }
+
+      // 上下方向键快速在 Master 列表中切换订阅
+      if ((event.key === 'ArrowUp' || event.key === 'ArrowDown') && currentNav === 'overview' && !document.activeElement.matches('input, textarea, select')) {
+        event.preventDefault();
+        const keys = Object.keys(subscriptions);
+        const idx = keys.indexOf(currentId);
+        if (event.key === 'ArrowDown' && idx < keys.length - 1) {
+          currentId = keys[idx + 1];
+          renderOverviewMaster();
+        } else if (event.key === 'ArrowUp' && idx > 0) {
+          currentId = keys[idx - 1];
+          renderOverviewMaster();
+        }
+      }
+    });
+
+    // 文件恢复监听
+    $('#hidden-file-input').addEventListener('change', e => {
+      const file = e.target.files[0];
+      if (file) importJsonBackup(file);
+      e.target.value = '';
+    });
+
+    // 搜索与输入监听
+    $('#global-search-input').addEventListener('input', () => {
+      if (currentNav === 'overview') renderOverviewMaster();
+      if (currentNav === 'library') {
+        $('#lib-filter-input').value = $('#global-search-input').value;
+        renderLibrary();
+      }
+    });
+    $('#lib-filter-input').addEventListener('input', renderLibrary);
+    $('#icon-search-input').addEventListener('input', renderIconPicker);
+
+    $('#master-sort-select').addEventListener('change', e => {
+      masterSortMode = e.target.value;
+      renderOverviewMaster();
+    });
+
+    $('#stop-select-month').addEventListener('change', e => {
+      $('#stop-calc-expiry').textContent = fmtDate(monthEnd(e.target.value));
+    });
+    $('#renew-input-months').addEventListener('change', updateRenewPreview);
+    $('#renew-input-date').addEventListener('input', updateRenewPreview);
+
+    $('#update-effective-month').addEventListener('change', renderUpdateModal);
+    $('#update-upgrade-date').addEventListener('input', renderUpdateModal);
+
+    // 系统主题监听与初始化
+    if (window.matchMedia) {
+      window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', () => {
+        if (appTheme === 'system') applyTheme('system');
+      });
+    }
+
+    // 初始渲染
+    applyTheme('dark');
+    renderOverviewMaster();
+  </script>
+</body>
+</html>

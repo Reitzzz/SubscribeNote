@@ -1,0 +1,1164 @@
+{
+  "subscriptions": {
+    "claude": {
+      "name": "Claude",
+      "logo": "A⌁",
+      "logoClass": "claude-logo",
+      "category": "AI",
+      "price": "$20 USD",
+      "cycle": "每月 · 自动扣费",
+      "nextLabel": "下次扣费日 · 30天后",
+      "next": "2026.10.01",
+      "monthly": "¥134.71",
+      "total": "¥134.71",
+      "yearly": "¥606.22",
+      "start": "2026.09.01",
+      "color": "#D97757",
+      "note": "$20 · 美元 · 月付",
+      "promo": true,
+      "future": [
+        [
+          "2026.10.01",
+          "订阅更新",
+          "$20 · 美元 · 月付 → $30 · 美元 · 月付",
+          "future"
+        ],
+        [
+          "2026.12.01",
+          "优惠结束",
+          "恢复 $20 · 美元 · 月付",
+          "hollow"
+        ]
+      ]
+    },
+    "wps": {
+      "name": "WPS 会员",
+      "logo": "W",
+      "logoClass": "wps-logo",
+      "category": "云服务",
+      "price": "¥177 CNY",
+      "cycle": "手动续费",
+      "nextLabel": "到期日 · 1058天后",
+      "next": "2029.07.25",
+      "monthly": "¥4.92",
+      "total": "¥177.00",
+      "yearly": "¥25.68",
+      "start": "2026.07.26",
+      "color": "#D4252B",
+      "note": "¥177 · 人民币 · 36个月",
+      "manual": true
+    },
+    "xsus": {
+      "name": "XSUS",
+      "logo": "▰",
+      "logoClass": "xsus-logo",
+      "category": "其他",
+      "price": "¥12 CNY",
+      "cycle": "每月 · 自动扣费",
+      "nextLabel": "下次扣费日 · 17天后",
+      "next": "2026.09.18",
+      "monthly": "¥12.00",
+      "total": "¥96.00",
+      "yearly": "¥144.00",
+      "start": "2026.01.18",
+      "color": "#D64453",
+      "note": "¥12 · 人民币 · 月付"
+    },
+    "bilibili": {
+      "name": "Bilibili 大会员",
+      "logo": "▣",
+      "logoClass": "bili-logo",
+      "category": "影音",
+      "price": "¥0 CNY",
+      "cycle": "手动续费",
+      "nextLabel": "到期日 · 30天后",
+      "next": "2026.10.01",
+      "monthly": "¥0.00",
+      "total": "¥0.00",
+      "yearly": "¥0.00",
+      "start": "2026.08.02",
+      "color": "#19A9D2",
+      "note": "¥0 · 人民币 · 试用",
+      "manual": true
+    },
+    "apple": {
+      "name": "Apple Music",
+      "logo": "♪",
+      "logoClass": "apple-logo",
+      "category": "影音",
+      "price": "¥7 CNY",
+      "cycle": "每月 · 自动扣费",
+      "nextLabel": "下次扣费日 · 28天后",
+      "next": "2026.09.29",
+      "monthly": "¥7.00",
+      "total": "¥42.00",
+      "yearly": "¥84.00",
+      "start": "2026.03.29",
+      "color": "#EF4055",
+      "note": "¥7 · 人民币 · 月付"
+    },
+    "anti": {
+      "name": "Antigravity",
+      "logo": "●",
+      "logoClass": "anti-logo",
+      "category": "AI",
+      "price": "¥16 CNY",
+      "cycle": "每年 · 自动扣费",
+      "nextLabel": "下次扣费日 · 302天后",
+      "next": "2027.06.30",
+      "monthly": "¥1.33",
+      "total": "¥16.00",
+      "yearly": "¥16.00",
+      "start": "2026.06.30",
+      "color": "#4F7EE9",
+      "note": "¥16 · 人民币 · 年付"
+    },
+    "tencent": {
+      "name": "腾讯视频",
+      "logo": "▶",
+      "category": "影音",
+      "price": "¥200 CNY",
+      "cycle": "每年 · 自动扣费",
+      "nextLabel": "下次扣费日 · 38天后",
+      "next": "2026.10.09",
+      "monthly": "¥16.67",
+      "total": "¥200.00",
+      "yearly": "¥200.00",
+      "start": "2025.10.09",
+      "color": "#FFAE35",
+      "note": "¥200 · 人民币 · 年付"
+    },
+    "chatgpt": {
+      "name": "ChatGPT",
+      "logo": "◎",
+      "category": "AI",
+      "price": "¥1430 JPY",
+      "cycle": "每月 · 自动扣费",
+      "nextLabel": "下次扣费日 · 21天后",
+      "next": "2026.09.22",
+      "monthly": "¥60.35",
+      "total": "¥120.69",
+      "yearly": "¥362.09",
+      "start": "2026.07.22",
+      "color": "#10A37F",
+      "note": "¥2860 · 日元 · 月付",
+      "future": [
+        [
+          "2026.08.01",
+          "套餐升级",
+          "即日起按 ¥1430/月 扣费",
+          "future"
+        ],
+        [
+          "2026.09.22",
+          "下次扣费",
+          "¥1430 · 日元 · 月付",
+          "hollow"
+        ]
+      ]
+    }
+  },
+  "library": [
+    {
+      "name": "Kimi",
+      "category": "AI"
+    },
+    {
+      "name": "文心一言",
+      "category": "AI"
+    },
+    {
+      "name": "通义千问",
+      "category": "AI"
+    },
+    {
+      "name": "豆包",
+      "category": "AI"
+    },
+    {
+      "name": "智谱清言",
+      "category": "AI"
+    },
+    {
+      "name": "讯飞星火",
+      "category": "AI"
+    },
+    {
+      "name": "海螺AI",
+      "category": "AI"
+    },
+    {
+      "name": "天工AI",
+      "category": "AI"
+    },
+    {
+      "name": "腾讯元宝",
+      "category": "AI"
+    },
+    {
+      "name": "DeepSeek",
+      "category": "AI"
+    },
+    {
+      "name": "Trae",
+      "category": "AI"
+    },
+    {
+      "name": "360智脑",
+      "category": "AI"
+    },
+    {
+      "name": "百川智能",
+      "category": "AI"
+    },
+    {
+      "name": "CodeGeeX",
+      "category": "AI"
+    },
+    {
+      "name": "阶跃星辰",
+      "category": "AI"
+    },
+    {
+      "name": "可灵AI",
+      "category": "AI"
+    },
+    {
+      "name": "即梦AI",
+      "category": "AI"
+    },
+    {
+      "name": "Vidu",
+      "category": "AI"
+    },
+    {
+      "name": "MiniMax",
+      "category": "AI"
+    },
+    {
+      "name": "Coze",
+      "category": "AI"
+    },
+    {
+      "name": "Bilibili 大会员",
+      "category": "影音"
+    },
+    {
+      "name": "爱奇艺",
+      "category": "影音"
+    },
+    {
+      "name": "优酷",
+      "category": "影音"
+    },
+    {
+      "name": "腾讯视频",
+      "category": "影音"
+    },
+    {
+      "name": "芒果TV",
+      "category": "影音"
+    },
+    {
+      "name": "QQ音乐",
+      "category": "影音"
+    },
+    {
+      "name": "网易云音乐",
+      "category": "影音"
+    },
+    {
+      "name": "酷狗音乐",
+      "category": "影音"
+    },
+    {
+      "name": "酷我音乐",
+      "category": "影音"
+    },
+    {
+      "name": "咪咕视频",
+      "category": "影音"
+    },
+    {
+      "name": "汽水音乐",
+      "category": "影音"
+    },
+    {
+      "name": "小宇宙",
+      "category": "影音"
+    },
+    {
+      "name": "红果短剧",
+      "category": "影音"
+    },
+    {
+      "name": "滴答清单",
+      "category": "工具效率"
+    },
+    {
+      "name": "FlowUs 息流",
+      "category": "工具效率"
+    },
+    {
+      "name": "有道云笔记",
+      "category": "工具效率"
+    },
+    {
+      "name": "石墨文档",
+      "category": "工具效率"
+    },
+    {
+      "name": "幕布",
+      "category": "工具效率"
+    },
+    {
+      "name": "扫描全能王",
+      "category": "工具效率"
+    },
+    {
+      "name": "剪映",
+      "category": "工具效率"
+    },
+    {
+      "name": "夸克网盘",
+      "category": "工具效率"
+    },
+    {
+      "name": "迅雷",
+      "category": "工具效率"
+    },
+    {
+      "name": "腾讯会议",
+      "category": "工具效率"
+    },
+    {
+      "name": "QQ邮箱会员",
+      "category": "工具效率"
+    },
+    {
+      "name": "苹果开发者",
+      "category": "工具效率"
+    },
+    {
+      "name": "力扣会员",
+      "category": "工具效率"
+    },
+    {
+      "name": "美图秀秀",
+      "category": "工具效率"
+    },
+    {
+      "name": "Nexitally",
+      "category": "工具效率"
+    },
+    {
+      "name": "Flomo",
+      "category": "工具效率"
+    },
+    {
+      "name": "UU加速器",
+      "category": "工具效率"
+    },
+    {
+      "name": "沉浸式翻译",
+      "category": "工具效率"
+    },
+    {
+      "name": "微信读书",
+      "category": "工具效率"
+    },
+    {
+      "name": "得到",
+      "category": "阅读知识"
+    },
+    {
+      "name": "QQ阅读",
+      "category": "阅读知识"
+    },
+    {
+      "name": "喜马拉雅",
+      "category": "阅读知识"
+    },
+    {
+      "name": "帆书",
+      "category": "阅读知识"
+    },
+    {
+      "name": "知识星球",
+      "category": "阅读知识"
+    },
+    {
+      "name": "知乎盐选会员",
+      "category": "阅读知识"
+    },
+    {
+      "name": "快看漫画",
+      "category": "阅读知识"
+    },
+    {
+      "name": "腾讯动漫",
+      "category": "阅读知识"
+    },
+    {
+      "name": "洪恩识字",
+      "category": "阅读知识"
+    },
+    {
+      "name": "宝宝巴士",
+      "category": "阅读知识"
+    },
+    {
+      "name": "斑马AI学",
+      "category": "阅读知识"
+    },
+    {
+      "name": "番茄小说",
+      "category": "阅读知识"
+    },
+    {
+      "name": "饿了么会员",
+      "category": "生活服务"
+    },
+    {
+      "name": "美团会员",
+      "category": "生活服务"
+    },
+    {
+      "name": "京东PLUS",
+      "category": "生活服务"
+    },
+    {
+      "name": "淘宝88VIP",
+      "category": "生活服务"
+    },
+    {
+      "name": "山姆会员",
+      "category": "生活服务"
+    },
+    {
+      "name": "滴滴出行会员",
+      "category": "生活服务"
+    },
+    {
+      "name": "携程超级会员",
+      "category": "生活服务"
+    },
+    {
+      "name": "盒马会员",
+      "category": "生活服务"
+    },
+    {
+      "name": "彩云天气",
+      "category": "生活服务"
+    },
+    {
+      "name": "哈啰单车",
+      "category": "生活服务"
+    },
+    {
+      "name": "英语流利说",
+      "category": "生活服务"
+    },
+    {
+      "name": "扇贝单词",
+      "category": "生活服务"
+    },
+    {
+      "name": "腾讯云",
+      "category": "云服务"
+    },
+    {
+      "name": "阿里云",
+      "category": "云服务"
+    },
+    {
+      "name": "华为云",
+      "category": "云服务"
+    },
+    {
+      "name": "百度智能云",
+      "category": "云服务"
+    },
+    {
+      "name": "火山引擎",
+      "category": "云服务"
+    },
+    {
+      "name": "原神月卡",
+      "category": "游戏"
+    },
+    {
+      "name": "崩坏：星穹铁道月卡",
+      "category": "游戏"
+    },
+    {
+      "name": "Weibo会员",
+      "category": "社交"
+    },
+    {
+      "name": "陌陌会员",
+      "category": "社交"
+    },
+    {
+      "name": "Keep 会员",
+      "category": "其他"
+    },
+    {
+      "name": "WPS 会员",
+      "category": "其他"
+    },
+    {
+      "name": "百度网盘",
+      "category": "其他"
+    },
+    {
+      "name": "阿里云盘",
+      "category": "其他"
+    },
+    {
+      "name": "ChatGPT",
+      "category": "AI"
+    },
+    {
+      "name": "Claude",
+      "category": "AI"
+    },
+    {
+      "name": "Gemini",
+      "category": "AI"
+    },
+    {
+      "name": "Midjourney",
+      "category": "AI"
+    },
+    {
+      "name": "GitHub Copilot",
+      "category": "AI"
+    },
+    {
+      "name": "Notion AI",
+      "category": "AI"
+    },
+    {
+      "name": "Cursor",
+      "category": "AI"
+    },
+    {
+      "name": "Perplexity",
+      "category": "AI"
+    },
+    {
+      "name": "Poe",
+      "category": "AI"
+    },
+    {
+      "name": "Jasper",
+      "category": "AI"
+    },
+    {
+      "name": "Grammarly Premium",
+      "category": "AI"
+    },
+    {
+      "name": "Adobe Firefly",
+      "category": "AI"
+    },
+    {
+      "name": "Windsurf",
+      "category": "AI"
+    },
+    {
+      "name": "Zed",
+      "category": "AI"
+    },
+    {
+      "name": "Antigravity",
+      "category": "AI"
+    },
+    {
+      "name": "DeepL Pro",
+      "category": "AI"
+    },
+    {
+      "name": "Monica",
+      "category": "AI"
+    },
+    {
+      "name": "Replit",
+      "category": "AI"
+    },
+    {
+      "name": "Luma AI",
+      "category": "AI"
+    },
+    {
+      "name": "Stability AI",
+      "category": "AI"
+    },
+    {
+      "name": "Grok",
+      "category": "AI"
+    },
+    {
+      "name": "Groq",
+      "category": "AI"
+    },
+    {
+      "name": "Microsoft Copilot",
+      "category": "AI"
+    },
+    {
+      "name": "ElevenLabs",
+      "category": "AI"
+    },
+    {
+      "name": "Flowith",
+      "category": "AI"
+    },
+    {
+      "name": "Ideogram",
+      "category": "AI"
+    },
+    {
+      "name": "Krea",
+      "category": "AI"
+    },
+    {
+      "name": "Lovable",
+      "category": "AI"
+    },
+    {
+      "name": "Manus",
+      "category": "AI"
+    },
+    {
+      "name": "NotebookLM",
+      "category": "AI"
+    },
+    {
+      "name": "Phind",
+      "category": "AI"
+    },
+    {
+      "name": "Pika",
+      "category": "AI"
+    },
+    {
+      "name": "Recraft",
+      "category": "AI"
+    },
+    {
+      "name": "Runway",
+      "category": "AI"
+    },
+    {
+      "name": "Suno",
+      "category": "AI"
+    },
+    {
+      "name": "v0",
+      "category": "AI"
+    },
+    {
+      "name": "OpenRouter",
+      "category": "AI"
+    },
+    {
+      "name": "Google Colab",
+      "category": "AI"
+    },
+    {
+      "name": "LangSmith",
+      "category": "AI"
+    },
+    {
+      "name": "Langfuse",
+      "category": "AI"
+    },
+    {
+      "name": "Haiper",
+      "category": "AI"
+    },
+    {
+      "name": "PixVerse",
+      "category": "AI"
+    },
+    {
+      "name": "Netflix",
+      "category": "影音"
+    },
+    {
+      "name": "YouTube",
+      "category": "影音"
+    },
+    {
+      "name": "Spotify",
+      "category": "影音"
+    },
+    {
+      "name": "Apple Music",
+      "category": "影音"
+    },
+    {
+      "name": "Disney+",
+      "category": "影音"
+    },
+    {
+      "name": "HBO",
+      "category": "影音"
+    },
+    {
+      "name": "Amazon Prime Video",
+      "category": "影音"
+    },
+    {
+      "name": "Apple TV+",
+      "category": "影音"
+    },
+    {
+      "name": "Hulu",
+      "category": "影音"
+    },
+    {
+      "name": "Paramount+",
+      "category": "影音"
+    },
+    {
+      "name": "Peacock",
+      "category": "影音"
+    },
+    {
+      "name": "Tidal",
+      "category": "影音"
+    },
+    {
+      "name": "Deezer",
+      "category": "影音"
+    },
+    {
+      "name": "SoundCloud Go+",
+      "category": "影音"
+    },
+    {
+      "name": "Notion",
+      "category": "工具效率"
+    },
+    {
+      "name": "Todoist",
+      "category": "工具效率"
+    },
+    {
+      "name": "1Password",
+      "category": "工具效率"
+    },
+    {
+      "name": "LastPass",
+      "category": "工具效率"
+    },
+    {
+      "name": "Dropbox",
+      "category": "工具效率"
+    },
+    {
+      "name": "Google One",
+      "category": "工具效率"
+    },
+    {
+      "name": "iCloud+",
+      "category": "工具效率"
+    },
+    {
+      "name": "Microsoft 365",
+      "category": "工具效率"
+    },
+    {
+      "name": "Adobe Creative Cloud",
+      "category": "工具效率"
+    },
+    {
+      "name": "Figma",
+      "category": "工具效率"
+    },
+    {
+      "name": "Canva",
+      "category": "工具效率"
+    },
+    {
+      "name": "Slack",
+      "category": "工具效率"
+    },
+    {
+      "name": "Zoom",
+      "category": "工具效率"
+    },
+    {
+      "name": "Linear",
+      "category": "工具效率"
+    },
+    {
+      "name": "Obsidian Sync",
+      "category": "工具效率"
+    },
+    {
+      "name": "Evernote",
+      "category": "工具效率"
+    },
+    {
+      "name": "Bear",
+      "category": "工具效率"
+    },
+    {
+      "name": "Setapp",
+      "category": "工具效率"
+    },
+    {
+      "name": "CleanMyMac",
+      "category": "工具效率"
+    },
+    {
+      "name": "Fantastical",
+      "category": "工具效率"
+    },
+    {
+      "name": "Things 3",
+      "category": "工具效率"
+    },
+    {
+      "name": "Craft",
+      "category": "工具效率"
+    },
+    {
+      "name": "Raindrop.io",
+      "category": "工具效率"
+    },
+    {
+      "name": "Tello",
+      "category": "工具效率"
+    },
+    {
+      "name": "Typeless",
+      "category": "工具效率"
+    },
+    {
+      "name": "Kindle Unlimited",
+      "category": "阅读知识"
+    },
+    {
+      "name": "Medium",
+      "category": "阅读知识"
+    },
+    {
+      "name": "The Information",
+      "category": "阅读知识"
+    },
+    {
+      "name": "华尔街日报",
+      "category": "阅读知识"
+    },
+    {
+      "name": "纽约时报",
+      "category": "阅读知识"
+    },
+    {
+      "name": "Readwise",
+      "category": "阅读知识"
+    },
+    {
+      "name": "Pocket Premium",
+      "category": "阅读知识"
+    },
+    {
+      "name": "Instapaper Pro",
+      "category": "阅读知识"
+    },
+    {
+      "name": "AWS",
+      "category": "云服务"
+    },
+    {
+      "name": "Google Cloud",
+      "category": "云服务"
+    },
+    {
+      "name": "Azure",
+      "category": "云服务"
+    },
+    {
+      "name": "Vercel",
+      "category": "云服务"
+    },
+    {
+      "name": "Netlify",
+      "category": "云服务"
+    },
+    {
+      "name": "DigitalOcean",
+      "category": "云服务"
+    },
+    {
+      "name": "Cloudflare",
+      "category": "云服务"
+    },
+    {
+      "name": "Heroku",
+      "category": "云服务"
+    },
+    {
+      "name": "Railway",
+      "category": "云服务"
+    },
+    {
+      "name": "Supabase Pro",
+      "category": "云服务"
+    },
+    {
+      "name": "PlanetScale",
+      "category": "云服务"
+    },
+    {
+      "name": "Xbox Game Pass",
+      "category": "游戏"
+    },
+    {
+      "name": "PlayStation Plus",
+      "category": "游戏"
+    },
+    {
+      "name": "Nintendo Switch Online",
+      "category": "游戏"
+    },
+    {
+      "name": "Steam",
+      "category": "游戏"
+    },
+    {
+      "name": "EA Play",
+      "category": "游戏"
+    },
+    {
+      "name": "Apple Arcade",
+      "category": "游戏"
+    },
+    {
+      "name": "Twitter/X Premium",
+      "category": "社交"
+    },
+    {
+      "name": "Discord Nitro",
+      "category": "社交"
+    },
+    {
+      "name": "Telegram Premium",
+      "category": "社交"
+    },
+    {
+      "name": "LinkedIn Premium",
+      "category": "社交"
+    },
+    {
+      "name": "Reddit Premium",
+      "category": "社交"
+    },
+    {
+      "name": "Costco会员",
+      "category": "其他"
+    },
+    {
+      "name": "ExpressVPN",
+      "category": "其他"
+    },
+    {
+      "name": "NordVPN",
+      "category": "其他"
+    },
+    {
+      "name": "Surfshark",
+      "category": "其他"
+    },
+    {
+      "name": "Namecheap 域名",
+      "category": "其他"
+    },
+    {
+      "name": "GoDaddy 域名",
+      "category": "其他"
+    },
+    {
+      "name": "Cloudflare 域名",
+      "category": "其他"
+    },
+    {
+      "name": "Duolingo Plus",
+      "category": "其他"
+    },
+    {
+      "name": "Strava",
+      "category": "其他"
+    },
+    {
+      "name": "Headspace",
+      "category": "其他"
+    },
+    {
+      "name": "Calm",
+      "category": "其他"
+    }
+  ],
+  "altData": {
+    "wps": [
+      [
+        "FlowUs 息流",
+        "¥18 /人/月",
+        "面向个人和小团队的 All-in-one 协作工具，近年增长很快",
+        "文档协作|知识库|项目管理|AI 助手",
+        "省 ¥159/月"
+      ],
+      [
+        "腾讯文档",
+        "¥18 /人/月",
+        "中国用户使用广泛，微信和 QQ 场景里的协作办公体验很强",
+        "多人协作|云端 Office|模板丰富",
+        "省 ¥159/月"
+      ],
+      [
+        "语雀",
+        "¥20 /人/月",
+        "阿里系知识库工具，个人和团队文档沉淀场景都很强",
+        "知识库|文档协作|团队空间",
+        "省 ¥157/月"
+      ],
+      [
+        "百度文库",
+        "¥25 /月",
+        "海量文档和资料，覆盖学习与办公场景",
+        "文档资料|模板|AI 助手",
+        "省 ¥152/月"
+      ]
+    ],
+    "xsus": [
+      [
+        "Surfshark",
+        "$12.95 /月",
+        "不限设备数，全家使用性价比很高",
+        "无限设备|隐私保护|CleanWeb|GPS 伪装",
+        "贵 ¥75.23/月"
+      ],
+      [
+        "NordVPN",
+        "$12.99 /月",
+        "双重加密 + 威胁防护，安全性最强",
+        "双重加密|5500+节点|威胁防护|暗网监控",
+        "贵 ¥75.50/月"
+      ],
+      [
+        "Nexitally",
+        "¥99 /月",
+        "稳定的网络代理工具，节点覆盖高",
+        "高速节点|多设备连接|稳定连接",
+        "贵 ¥87/月"
+      ]
+    ],
+    "bilibili": [
+      [
+        "咪咕视频",
+        "18/月",
+        "体育赛事版权最全，中超英超独家直播",
+        "体育赛事|中超英超|4K HDR|移动权益联动",
+        ""
+      ],
+      [
+        "芒果TV",
+        "22/月",
+        "湖南卫视综艺独播，国产综艺看这里就够了",
+        "湖南卫视独播|综艺王牌|自制剧|性价比高",
+        ""
+      ],
+      [
+        "爱奇艺",
+        "25/月",
+        "热播剧综首选，4K 杜比视听体验好",
+        "热播剧综|4K 杜比|奇异果TV|自制综艺",
+        ""
+      ],
+      [
+        "优酷",
+        "25/月",
+        "阿里影业资源丰富，港剧经典库存大",
+        "阿里影业资源|港剧经典|优酷自制|酷喵TV",
+        ""
+      ],
+      [
+        "腾讯视频",
+        "25/月",
+        "视频会员服务",
+        "影视剧|综艺|动漫",
+        ""
+      ]
+    ],
+    "apple": [
+      [
+        "SoundCloud Go+",
+        "$9.99 /月",
+        "独立音乐和 DJ 混音内容最丰富",
+        "独立音乐人|混音/DJ内容|离线收听|社区互动",
+        "贵 ¥60.29/月"
+      ],
+      [
+        "Tidal",
+        "$10.99 /月",
+        "HiFi 发烧友首选，杜比全景声音质顶级",
+        "HiFi无损音质|杜比全景声|独家首发|艺术家直播",
+        "贵 ¥67.03/月"
+      ],
+      [
+        "Deezer",
+        "$10.99 /月",
+        "全球曲库 + 无损 FLAC，Flow 推荐很懂你",
+        "全球曲库|无损 FLAC|歌词同步|Flow 推荐",
+        "贵 ¥67.03/月"
+      ],
+      [
+        "Spotify",
+        "$11.99 /月",
+        "全球最大曲库融合顶级个性化推荐算法",
+        "全球最大曲库|个性化推荐|播客整合",
+        "贵 ¥73.76/月"
+      ]
+    ]
+  },
+  "currencyNames": {
+    "CNY": "¥ 人民币",
+    "USD": "$ 美元",
+    "EUR": "€ 欧元",
+    "GBP": "£ 英镑",
+    "JPY": "¥ 日元",
+    "HKD": "HK$ 港币",
+    "TWD": "NT$ 新台币",
+    "KRW": "₩ 韩元",
+    "SGD": "S$ 新加坡元",
+    "MYR": "RM 马来西亚林吉特",
+    "AUD": "A$ 澳元",
+    "CAD": "C$ 加拿大元",
+    "CHF": "CHF 瑞士法郎",
+    "INR": "₹ 印度卢比",
+    "RUB": "₽ 俄罗斯卢布",
+    "BRL": "R$ 巴西雷亚尔",
+    "ARS": "AR$ 阿根廷比索",
+    "SEK": "kr 瑞典克朗",
+    "NOK": "kr 挪威克朗",
+    "SAR": "﷼ 沙特里亚尔",
+    "ILS": "₪ 以色列新谢克尔",
+    "EGP": "E£ 埃及镑"
+  },
+  "categories": [
+    "影音",
+    "工具效率",
+    "AI",
+    "阅读知识",
+    "生活服务",
+    "云服务",
+    "游戏",
+    "社交",
+    "其他"
+  ]
+}
